@@ -1,7 +1,7 @@
-import { useState, useEffect, memo, Fragment } from "react";
+import { useState, memo, Fragment } from "react";
 
 //react-bootstrap
-import { Offcanvas, Row, Col } from "react-bootstrap";
+import { Row, Col } from "react-bootstrap";
 
 // Redux Selector / Action
 import { useSelector } from "react-redux";
@@ -12,14 +12,14 @@ import * as SettingSelector from "../../store/setting/selectors";
 // Section Components
 // Style Setting Section Components
 import ColorCustomizer from "./sections/color-customizer";
-import Direction from "./sections/direction";
+// import Direction from "./sections/direction";
 
 
 const SettingOffCanvas = memo(() => {
   const [show, setShow] = useState(false);
-  
+
   // Define selectors
-  const themeSchemeDirection = useSelector(SettingSelector.theme_scheme_direction);
+  // const themeSchemeDirection = useSelector(SettingSelector.theme_scheme_direction);
   const themeColor = useSelector(SettingSelector.theme_color);
   return (
     <Fragment>
@@ -48,10 +48,9 @@ const SettingOffCanvas = memo(() => {
           </svg>
         </a>
         <div
-          className={`offcanvas offcanvas-end live-customizer end ${
-            show ? "show" : "hiding"
-          }`}
-          // placement={`${themeSchemeDirection === "rtl" ? 'start' : 'end'}`}
+          className={`offcanvas offcanvas-end live-customizer end ${show ? "show" : "hiding"
+            }`}
+        // placement={`${themeSchemeDirection === "rtl" ? 'start' : 'end'}`}
         >
           <div className="offcanvas-header">
             <div className="d-flex align-items-center">
@@ -90,7 +89,7 @@ const SettingOffCanvas = memo(() => {
               <Col lg={12}>
                 <div>
                   <div>
-                    <Direction themeSchemeDirection={themeSchemeDirection}></Direction>
+                    {/* <Direction themeSchemeDirection={themeSchemeDirection}></Direction> */}
                     <ColorCustomizer themeColor={themeColor}></ColorCustomizer>
                   </div>
                 </div>

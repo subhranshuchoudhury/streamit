@@ -1,3 +1,4 @@
+// This is the top navbar
 import { memo, Fragment, useState, useEffect } from "react";
 
 // react-bootstrap
@@ -92,7 +93,7 @@ const HeaderDefault = memo(() => {
                 id="navbar_main"
               >
                 <Container fluid className="container-fluid p-lg-0">
-                  <Offcanvas.Header className="px-0" closeButton>
+                  <Offcanvas.Header className="px-0" closeButton onClick={() => setShow1(false)}>
                     <div className="navbar-brand ms-3">
                       <Logo></Logo>
                     </div>
@@ -103,6 +104,7 @@ const HeaderDefault = memo(() => {
                   >
                     <Nav.Item as="li">
                       <Nav.Link
+                        href=""
                         aria-expanded={open}
                         onClick={() => setOpen(!open)}
                         className={`${location.asPath === "/" ||
@@ -134,6 +136,7 @@ const HeaderDefault = memo(() => {
                         </span>
                       </Nav.Link>
                       <Collapse
+                        in={open}
                         className={`sub-nav justify-content-center list-unstyled ${isMega ? " mega-menu-item" : ""
                           }`}
                       >

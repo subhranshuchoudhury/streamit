@@ -10,6 +10,8 @@ export interface MovieType {
     thumbnail: string;
     collectionId: string;
     trailer: string;
+    video_id: string;
+    library_id: string;
     created: string;
     updated: string;
 }

@@ -11,7 +11,7 @@ import FsLightbox from "fslightbox-react";
 
 interface Props {
   image: string,
-  sources: string[]
+  sources?: string[]
 }
 const FsLightBox = memo((props: Props) => {
   const [toggler, setToggler] = useState(false);

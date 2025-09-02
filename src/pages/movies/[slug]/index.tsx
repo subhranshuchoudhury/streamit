@@ -1,36 +1,30 @@
-import React, { memo, Fragment } from "react";
+import { memo, Fragment, useEffect, useState } from "react";
 
 //react-bootstrap
-import { Row, Col, Container, Nav, Tab, Form } from "react-bootstrap";
+import { Row, Col, Container, Nav, Tab } from "react-bootstrap";
 
 //react-router-dom
-import Link from 'next/link'
+import Link from 'next/link';
 
 //components
-import ReviewComponent from "@/components/ReviewComponent";
-import Sources from "@/components/Sources";
 import MoviesRecommendedForYou from "@/components/sections/MoviesRecommendedForYou";
 import RelatedVideos from "@/components/sections/RelatedVideos";
 import UpcomingMovies from "@/components/sections/UpcomingMovies";
 import RelatedMovies from "@/components/sections/RelatedMovies";
 import FsLightBox from "@/components/fslight-box";
 import RatingStar from "@/components/rating-star";
-import VideoJS from "@/components/plugins/VideoJs";
 
 //function
-import { generateImgPath } from "@/StaticData/data";
 
 //utilites
 import { useEnterExit } from "@/utilities/usePage";
 
 //swiper
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper";
 import { ClientProvider } from "@/providers/client.provider";
 import { useRouter } from "next/router";
 import pb from "@/lib/pocketbase";
 import { MovieType } from "@/types/pb.types";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { formatTime } from "@/helper/ms-to-hm";
 
 // date, type
@@ -118,27 +112,57 @@ const MoviesDetail = memo(() => {
         enabled: !!slug,
     });
 
+
+
     useEnterExit();
 
-    const playerRef = React.useRef(null);
 
-    const videoJsOptions = {
-        autoplay: false,
-        controls: true,
-        responsive: true,
-        techOrder: ["youtube"],
-        sources: [
-            {
-                src: "https://www.youtube.com/watch?v=QCGq1epI9pQ",
-                type: "video/youtube",
+
+    const fetchStreamSource = async ({
+        video_id,
+        library_id,
+    }: {
+        video_id: string;
+        library_id: string;
+    }) => {
+        const response = await pb.send("/api/iframe-stream-source", {
+            method: "POST",
+            body: JSON.stringify({ video_id, library_id }),
+            headers: {
+                "Content-Type": "application/json",
             },
-        ],
-        youtube: { iv_load_policy: 1 },
+        });
+
+        return {
+            source: response.source,
+            token: response.token,
+            expires: response.expires,
+        };
     };
 
-    const handlePlayerReady = (player: any) => {
-        playerRef.current = player;
+    const useStreamSourceMutation = () => {
+        return useMutation({
+            mutationFn: fetchStreamSource,
+        });
     };
+
+    const { mutate, data: streamSource, error: streamSourceError, isPending } = useStreamSourceMutation();
+
+
+    useEffect(() => {
+        if (movie && movie.video_id && movie.library_id) {
+            mutate({ video_id: movie.video_id, library_id: movie.library_id }, {
+                onSuccess: (data) => {
+                    console.log("Stream source fetched successfully:", data);
+                },
+                onError: (error) => {
+                    console.error("Error fetching stream source:", error);
+                }
+            });
+        }
+    }, [movie])
+
+
 
     return (
         <Fragment>
@@ -147,7 +171,17 @@ const MoviesDetail = memo(() => {
                     <Row>
                         <Col lg="12">
                             <div className="pt-0">
-                                <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
+                                {/* <VideoJS options={videoJsOptions} onReady={handlePlayerReady} /> */}
+                                <div
+                                    style={{ paddingTop: '56.25%', position: 'relative' }}
+                                >
+                                    {
+                                        movie?.video_id && streamSource?.source && streamSource.token && streamSource.token ? <>
+
+                                            <iframe src={`https://iframe.mediadelivery.net/embed/${movie.library_id}/${movie.video_id}?token=${streamSource.token}&expires=${streamSource.expires}&autoplay=false&loop=false&muted=false&preload=true&responsive=true`} loading="lazy" style={{ border: 0, position: "absolute", top: 0, height: "100%", width: "100%" }} allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" allowFullScreen></iframe>
+                                        </> : null
+                                    }
+                                </div>
                             </div>
                         </Col>
                     </Row>

@@ -7,40 +7,17 @@ import ContinueWatchCard from "../cards/ContinueWatchCard";
 // Function
 import { generateImgPath } from "../../StaticData/data";
 
+// Import JSON directly
+import continueWatchingData from "../../data/continueWatching.json";
+
 const ContinueWatching: FC = memo(() => {
   const [title] = useState("Continue Watching");
-  const [watching, setWatching] = useState([
-    {
-      image: generateImgPath("/assets/images/continue-watch/01.webp"),
-      value: 50,
-      leftTime: "70 of 230 m",
-    },
-    {
-      image: generateImgPath("/assets/images/continue-watch/02.webp"),
-      value: 90,
-      leftTime: "120 of 130 m",
-    },
-    {
-      image: generateImgPath("/assets/images/continue-watch/03.webp"),
-      value: 60,
-      leftTime: "60 of 134 m",
-    },
-    {
-      image: generateImgPath("/assets/images/continue-watch/04.webp"),
-      value: 30,
-      leftTime: "60 of 134 m",
-    },
-    {
-      image: generateImgPath("/assets/images/continue-watch/05.webp"),
-      value: 95,
-      leftTime: "45 of 157 m",
-    },
-    {
-      image: generateImgPath("/assets/images/continue-watch/06.webp"),
-      value: 100,
-      leftTime: "70 of 230 m",
-    },
-  ]);
+
+  // Format data once
+  const watching = continueWatchingData.map((item) => ({
+    ...item,
+    image: generateImgPath(item.image),
+  }));
 
   return (
     <Fragment>

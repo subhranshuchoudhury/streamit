@@ -83,7 +83,7 @@ import { formatTime } from "@/helper/ms-to-hm";
 
 
 
-const MoviesDetail = memo(() => {
+const MoviesDetail = () => {
 
     const router = useRouter();
     const { slug } = router.query;
@@ -146,6 +146,8 @@ const MoviesDetail = memo(() => {
         });
     };
 
+    const [streamToken, setStreamToken] = useState<string>("")
+
     const { mutate, data: streamSource, error: streamSourceError, isPending } = useStreamSourceMutation();
 
 
@@ -160,7 +162,19 @@ const MoviesDetail = memo(() => {
                 }
             });
         }
-    }, [movie])
+    }, [movie]);
+
+    // // mutate in 20 seconds
+    // useEffect(() => {
+    //     const interval = setInterval(async () => {
+    //         if (movie && movie.video_id && movie.library_id) {
+    //             const response = await fetchStreamSource({ video_id: movie.video_id, library_id: movie.library_id });
+    //             setStreamToken(response.token);
+    //             console.log("Stream source refreshed:", response);
+    //         }
+    //     }, 20000);
+    //     return () => clearInterval(interval);
+    // }, [movie]);
 
 
 
@@ -171,14 +185,26 @@ const MoviesDetail = memo(() => {
                     <Row>
                         <Col lg="12">
                             <div className="pt-0">
+
+                                {(isLoading || isRefetching) &&
+                                    <>
+                                        <div style={{ paddingTop: '20.25%' }}>
+                                            <div className="d-flex justify-content-center text-primary">
+                                                <div className="spinner-border" role="status">
+                                                    <span className="sr-only">Loading...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                }
+
                                 {/* <VideoJS options={videoJsOptions} onReady={handlePlayerReady} /> */}
                                 <div
                                     style={{ paddingTop: '56.25%', position: 'relative' }}
                                 >
                                     {
                                         movie?.video_id && streamSource?.source && streamSource.token && streamSource.token ? <>
-
-                                            <iframe src={`https://iframe.mediadelivery.net/embed/${movie.library_id}/${movie.video_id}?token=${streamSource.token}&expires=${streamSource.expires}&autoplay=false&loop=false&muted=false&preload=true&responsive=true`} loading="lazy" style={{ border: 0, position: "absolute", top: 0, height: "100%", width: "100%" }} allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" allowFullScreen></iframe>
+                                            <iframe src={streamSource.source} loading="lazy" style={{ border: 0, position: "absolute", top: 0, height: "100%", width: "100%" }} allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" allowFullScreen></iframe>
                                         </> : null
                                     }
                                 </div>
@@ -205,7 +231,7 @@ const MoviesDetail = memo(() => {
                                                     starColor="text-warning"
                                                 />
                                                 <span className="text-white ms-2">
-                                                    {movie?.rating} (CM)
+                                                    {movie?.rating} (IMDB)
                                                 </span>
                                             </div>
                                         </div>
@@ -575,7 +601,7 @@ const MoviesDetail = memo(() => {
             <UpcomingMovies />
         </Fragment>
     );
-});
+};
 
 MoviesDetail.displayName = "MoviesDetail";
 

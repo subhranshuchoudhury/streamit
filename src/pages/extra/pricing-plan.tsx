@@ -6,55 +6,56 @@ import { Col, Container, Row } from "react-bootstrap"
 //custom hook
 import { useBreadcrumb } from "@/utilities/usePage";
 
+// PocketBase client
+import PocketBase from "pocketbase";
+
+const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090");
+
 const PricingPage = memo(() => {
   useBreadcrumb('Pricing Plan')
   
   const [loading, setLoading] = useState<string | null>(null);
   
-  // USD to INR conversion rate (you might want to fetch this from an API)
-  const USD_TO_INR = 83; // Current approximate rate
-  
+  const USD_TO_INR = 83; // approximate conversion
+
   const plans = [
-    {
-      id: 'free',
-      name: 'Free',
-      priceUSD: 0,
-      priceINR: 0,
-      duration: 'Forever',
-      features: [
-        { text: 'Ads free movies and shows', included: true },
-        { text: 'Watch on TV or Laptop', included: false },
-        { text: 'Streamit Special', included: false },
-        { text: 'Max video quality', included: false },
-      ]
-    },
-    {
-      id: 'premium',
-      name: 'Premium',
-      priceUSD: Math.round(499 / USD_TO_INR), // approx 6 USD
-      priceINR: 499,
-      originalPriceUSD: Math.round(599 / USD_TO_INR),
-      originalPriceINR: 599,
-      duration: '3 Month',
-      discount: 'Save ₹100',
-      features: [
-        { text: 'Ads free movies and shows', included: true },
-        { text: 'Watch on TV or Laptop', included: true },
-        { text: 'Streamit Special', included: true },
-        { text: 'Max video quality', included: true },
-      ]
-    },
     {
       id: 'basic',
       name: 'Basic',
-      priceUSD: Math.round(199 / USD_TO_INR), // approx 2.5 USD
-      priceINR: 199,
+      priceUSD: Math.round(99 / USD_TO_INR),
+      priceINR: 99,
       duration: '1 Month',
       features: [
         { text: 'Ads free movies and shows', included: false },
         { text: 'Watch on TV or Laptop', included: true },
         { text: 'Streamit Special', included: true },
         { text: 'Max video quality', included: true },
+      ]
+    },
+    {
+      id: 'premium',
+      name: 'Premium',
+      priceUSD: Math.round(199 / USD_TO_INR),
+      priceINR: 199,
+      duration: '1 Month',
+      features: [
+        { text: 'Ads free movies and shows', included: true },
+        { text: 'Watch on TV or Laptop', included: true },
+        { text: 'Streamit Special', included: true },
+        { text: 'Max video quality', included: true },
+      ]
+    },
+    {
+      id: 'ultra',
+      name: 'Ultra Premium',
+      priceUSD: Math.round(399 / USD_TO_INR),
+      priceINR: 399,
+      duration: '1 Month',
+      features: [
+        { text: 'Ads free movies and shows', included: true },
+        { text: 'Watch on TV or Laptop', included: true },
+        { text: 'Streamit Special', included: true },
+        { text: 'Max video quality (4K + HDR)', included: true },
       ]
     }
   ];
@@ -72,8 +73,9 @@ const PricingPage = memo(() => {
   }
 
   async function handlePay(planId: string, priceINR: number, planName: string) {
-    if (priceINR === 0) {
-      alert("Free plan selected!");
+    // 🔹 Step 1: Check PocketBase Auth
+    if (!pb.authStore.isValid || !pb.authStore.model) {
+      window.location.href = "/auth/login"; // redirect if not logged in
       return;
     }
 
@@ -103,7 +105,7 @@ const PricingPage = memo(() => {
         order_id: order.id,
         name: "StreamIT",
         description: `${planName} Plan Subscription`,
-        image: "/logo.png", // Add your logo path
+        image: "/logo.png",
         handler: async (response: any) => {
           try {
             const verifyRes = await fetch("/api/razorpay/verify-payment", {
@@ -114,7 +116,6 @@ const PricingPage = memo(() => {
             const data = await verifyRes.json();
             if (data.success) {
               alert("✅ Payment verified! Welcome to " + planName + " plan!");
-              // Redirect to dashboard or success page
             } else {
               alert("❌ Payment verification failed!");
             }
@@ -124,13 +125,11 @@ const PricingPage = memo(() => {
           }
         },
         prefill: {
-          name: "",
-          email: "",
+          name: pb.authStore.model?.name || "",
+          email: pb.authStore.model?.email || "",
           contact: ""
         },
-        theme: { 
-          color: "#3399cc" 
-        },
+        theme: { color: "#3399cc" },
         modal: {
           ondismiss: function() {
             setLoading(null);
@@ -154,29 +153,10 @@ const PricingPage = memo(() => {
             {plans.map((plan) => (
               <Col key={plan.id} lg="4" md="6" className="mb-3 mb-lg-0">
                 <div className="pricing-plan-wrapper">
-                  {plan.discount && (
-                    <div className="pricing-plan-discount bg-primary p-2 text-center">
-                      <span className="text-white">{plan.discount}</span>
-                    </div>
-                  )}
                   <div className="pricing-plan-header">
                     <h4 className="plan-name text-capitalize text-body mb-0">{plan.name}</h4>
-                    {plan.originalPriceINR && (
-                      <>
-                        <span className="sale-price text-decoration-line-through">
-                          ₹{Math.round(plan.originalPriceINR)}
-                        </span>
-                        <br />
-                      </>
-                    )}
-                    {plan.priceINR > 0 ? (
-                      <>
-                        <span className="main-price text-primary">₹{Math.round(plan.priceINR)}</span>
-                        <span className="font-size-18">/ {plan.duration}</span>
-                      </>
-                    ) : (
-                      <span className="main-price text-primary">Free</span>
-                    )}
+                    <span className="main-price text-primary">₹{Math.round(plan.priceINR)}</span>
+                    <span className="font-size-18">/ {plan.duration}</span>
                   </div>
                   <div className="pricing-details">
                     <div className="pricing-plan-description">

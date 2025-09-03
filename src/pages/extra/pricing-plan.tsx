@@ -31,12 +31,12 @@ const PricingPage = memo(() => {
     {
       id: 'premium',
       name: 'Premium',
-      priceUSD: 39,
-      priceINR: 39 * USD_TO_INR,
-      originalPriceUSD: 49,
-      originalPriceINR: 49 * USD_TO_INR,
+      priceUSD: Math.round(499 / USD_TO_INR), // approx 6 USD
+      priceINR: 499,
+      originalPriceUSD: Math.round(599 / USD_TO_INR),
+      originalPriceINR: 599,
       duration: '3 Month',
-      discount: 'Save 20%',
+      discount: 'Save ₹100',
       features: [
         { text: 'Ads free movies and shows', included: true },
         { text: 'Watch on TV or Laptop', included: true },
@@ -47,8 +47,8 @@ const PricingPage = memo(() => {
     {
       id: 'basic',
       name: 'Basic',
-      priceUSD: 19,
-      priceINR: 19 * USD_TO_INR,
+      priceUSD: Math.round(199 / USD_TO_INR), // approx 2.5 USD
+      priceINR: 199,
       duration: '1 Month',
       features: [
         { text: 'Ads free movies and shows', included: false },
@@ -216,4 +216,4 @@ const PricingPage = memo(() => {
 })
 
 PricingPage.displayName = "PricingPage"
-export default PricingPage;
+export default PricingPage

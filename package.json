@@ -27,6 +27,7 @@
     "next-redux-wrapper": "^8.1.0",
     "npm": "^10.2.4",
     "pocketbase": "^0.26.2",
+    "razorpay": "^2.9.6",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.1",
     "react-countup": "^6.5.0",

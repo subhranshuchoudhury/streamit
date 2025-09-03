@@ -10,7 +10,8 @@ import Link from 'next/link'
 import FsLightbox from "fslightbox-react";
 
 interface Props {
-  image: string
+  image: string,
+  sources?: string[]
 }
 const FsLightBox = memo((props: Props) => {
   const [toggler, setToggler] = useState(false);
@@ -42,7 +43,7 @@ const FsLightBox = memo((props: Props) => {
           maxYoutubeVideoDimensions={{ width: 700, height: 400 }}
           exitFullscreenOnClose={true}
           toggler={toggler}
-          sources={["https://www.youtube.com/watch?v=QCGq1epI9pQ"]}
+          sources={props.sources}
         />
       </>
     </Fragment>

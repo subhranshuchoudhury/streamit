@@ -11,10 +11,13 @@ import Frontend from "@/layouts/Frontend";
 import Blank from '@/layouts/blank';
 import Merchandise from '@/layouts/MerchandiseLayout';
 
-//store
+// store
 import { Provider } from 'react-redux';
-//reducer
+// reducer
 import { wrapperStore } from '@/store'
+
+// ✅ React Query Provider
+import ReactQueryProvider from "@/lib/ReactQueryProvider";
 
 const layouts: any = {
   "Blank": Blank,
@@ -35,15 +38,16 @@ export default function App({ Component, ...rest }: AppPropsWithLayout) {
   const Layout = layoutName || ((children: any) => <>{children}</>);
   const { store, props } = wrapperStore.useWrappedStore(rest);
   const { pageProps } = props;
+
   return (
     <Provider store={store}>
-      {/* <SSRProvider> */}
-      <AppLayout>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </AppLayout>
-      {/* </SSRProvider> */}
+      <ReactQueryProvider>
+        <AppLayout>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </AppLayout>
+      </ReactQueryProvider>
     </Provider>
   )
 }

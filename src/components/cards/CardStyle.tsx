@@ -13,18 +13,21 @@ const CardStyle = memo((props: Props) => {
   return (
     <Fragment>
       <div className="iq-card card-hover" style={{ height: "100%" }}>
-        <div className="block-images position-relative w-100" 
-          style={{ 
-            height: "100%", 
-            display: "flex", 
+        <div
+          className="block-images position-relative w-100"
+          style={{
+            height: "100%",
+            display: "flex",
             flexDirection: "column",
             transition: "all 0.3s ease"
           }}
         >
-          <div className="img-box w-100" 
-            style={{ 
-              flex: "0 0 80%", 
-              height: "80%",
+          {/* 🔹 Thumbnail now 60% */}
+          <div
+            className="img-box w-100"
+            style={{
+              flex: "0 0 60%",
+              height: "60%",
               transition: "all 0.3s ease"
             }}
           >
@@ -36,14 +39,16 @@ const CardStyle = memo((props: Props) => {
               src={props.image}
               alt="movie-card"
               className="img-fluid object-cover w-100 d-block border-0"
-              style={{ 
-                height: "100%", 
+              style={{
+                height: "100%",
                 objectFit: "cover",
                 transition: "all 0.3s ease"
               }}
             />
           </div>
-          <div style={{ flex: "0 0 20%", height: "20%" }}>
+
+          {/* 🔹 Description now 40% */}
+          <div style={{ flex: "0 0 40%", height: "40%" }}>
             <div className="card-description with-transition">
               <div className="cart-content">
                 <div className="content-left">

@@ -1,7 +1,6 @@
 import { Fragment, memo, useState } from "react";
 import { useRouter } from "next/router"; // Import useRouter for redirection
 import { Col, Container, Row } from "react-bootstrap";
-import Link from "next/link";
 import { useBreadcrumb } from "@/utilities/usePage";
 import pb from "@/lib/pocketbase";
 
@@ -18,7 +17,7 @@ const PricingPage = () => {
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js  ";
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.onload = () => resolve(true);
       script.onerror = () => resolve(false);
       document.body.appendChild(script);
@@ -34,7 +33,7 @@ const PricingPage = () => {
 
     // Set loading state for the specific plan
     setLoadingStates(prev => ({ ...prev, [planType]: true }));
-    
+
     try {
       const res = await fetch("/api/create-subscription", {
         method: "POST",
@@ -321,7 +320,7 @@ const PricingPage = () => {
           background: linear-gradient(135deg, #0d2b3e 0%, #1a3d55 100%);
         }
       `}</style>
-      
+
       {isSubscribed ? (
         <div className="alert alert-success text-center mx-3 mb-4">
           <h4>🎉 Premium Item Visible: Here's the exclusive content!</h4>
@@ -331,7 +330,7 @@ const PricingPage = () => {
           📺 Subscribe to view exclusive content and unlock all features!
         </div>
       )}
-      
+
       <div className="section-padding">
         <Container>
           <Row className="justify-content-center">
@@ -366,8 +365,8 @@ const PricingPage = () => {
                   </ul>
                 </div>
                 <div className="subscribe-footer">
-                  <button 
-                    className="subscribe-btn free-btn" 
+                  <button
+                    className="subscribe-btn free-btn"
                     onClick={() => handleSubscribe('Free', 99)}
                     disabled={loadingStates.Free}
                   >
@@ -376,7 +375,7 @@ const PricingPage = () => {
                 </div>
               </div>
             </Col>
-            
+
             <Col lg="4" md="6" className="mb-4">
               <div className="pricing-card premium-card">
                 <div className="premium-badge">
@@ -414,8 +413,8 @@ const PricingPage = () => {
                   </ul>
                 </div>
                 <div className="subscribe-footer">
-                  <button 
-                    className="subscribe-btn premium-btn" 
+                  <button
+                    className="subscribe-btn premium-btn"
                     onClick={() => handleSubscribe('Premium', 199)}
                     disabled={loadingStates.Premium}
                   >
@@ -424,7 +423,7 @@ const PricingPage = () => {
                 </div>
               </div>
             </Col>
-            
+
             <Col lg="4" md="6" className="mb-4">
               <div className="pricing-card">
                 <div className="plan-header">
@@ -456,8 +455,8 @@ const PricingPage = () => {
                   </ul>
                 </div>
                 <div className="subscribe-footer">
-                  <button 
-                    className="subscribe-btn basic-btn" 
+                  <button
+                    className="subscribe-btn basic-btn"
                     onClick={() => handleSubscribe('Basic', 349)}
                     disabled={loadingStates.Basic}
                   >

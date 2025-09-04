@@ -15,27 +15,46 @@ export default async function handler(
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { plan_id, customer_id } = req.body;
+    const { amount, customer_id, plan_type } = req.body;
 
-    console.log('Creating subscription for plan:', plan_id, 'and customer:', customer_id);
+    console.log('Creating subscription for amount:', amount, 'customer:', customer_id, 'plan type:', plan_type);
 
-    if (!plan_id || !customer_id) {
-        return res.status(400).json({ error: 'Missing plan_id or customer_id' });
+    if (!amount || !customer_id || !plan_type) {
+        return res.status(400).json({ error: 'Missing amount, customer_id, or plan_type' });
     }
-
 
     try {
+        // Create a plan dynamically based on the amount
+        const plan = await rzp.plans.create({
+            period: 'monthly',
+            interval: 1,
+            item: {
+                name: `${plan_type} Plan`,
+                amount: Number(amount) * 100, // Convert to paise
+                currency: 'INR',
+                description: `${plan_type} subscription plan`
+            }
+        });
+
+        // Create subscription using the newly created plan
         const subscription = await rzp.subscriptions.create({
-            plan_id: String(plan_id).trim(), // e.g., from dashboard or created plan
+            plan_id: plan.id,
             customer_notify: 1,
-            total_count: 12, // e.g., max 12 charges (1 year), adjust as needed
+            total_count: 12, // 12 months
             notes: {
-                customer_id: String(customer_id).trim(), // For your reference
+                customer_id: String(customer_id).trim(),
+                plan_type: String(plan_type).trim(),
             },
         });
+
         return res.status(200).json(subscription);
-    } catch (error) {
-        return res.status(500).json({ error: 'Failed to create subscription' });
+    } catch (error: any) {
+        console.error('Subscription creation error:', error);
+        return res.status(500).json({ error: 'Failed to create subscription', details: error.message });
     }
 
+
+
+
+    res.status(200).json({ message: 'Hello from Next.js!', plan_id, customer_id })
 }

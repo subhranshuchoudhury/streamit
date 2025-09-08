@@ -1,5 +1,6 @@
 import React, { Fragment, memo, useMemo } from "react";
-import { Row, Col, Container, Nav, Tab } from "react-bootstrap";
+// Import Spinner from react-bootstrap
+import { Row, Col, Container, Nav, Tab, Spinner } from "react-bootstrap";
 import Link from 'next/link';
 import { useRouter } from "next/router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -23,6 +24,7 @@ import { useEnterExit } from "@/utilities/usePage";
 import { generateImgPath } from "@/StaticData/data";
 import videojs from "video.js";
 import { ClientProvider } from "@/providers/client.provider";
+import { formatTime } from "@/helper/ms-to-hm";
 
 // Helper to get correct PocketBase file URL
 const getPbImageUrl = (
@@ -78,7 +80,6 @@ const EpisodePage = memo(() => {
     const playerRef = React.useRef(null);
 
     // Fetch the entire series data.
-    // React Query will use the cached data from the previous page if available.
     const fetchSeriesData = async (slug: string) => {
         if (!slug) return;
         return pb.collection('tv_shows').getFirstListItem<TVShow>(`slug="${slug}"`, {
@@ -92,26 +93,34 @@ const EpisodePage = memo(() => {
         enabled: !!seriesSlug,
     });
 
-    // Find the current season and episode from the fetched data
-    const { currentSeason, currentEpisode, otherEpisodes } = useMemo(() => {
+    // ** UPDATED to find the next episode **
+    const { currentSeason, currentEpisode, otherEpisodes, nextEpisode } = useMemo(() => {
+        const defaultState = { currentSeason: null, currentEpisode: null, otherEpisodes: [], nextEpisode: null };
         if (!series?.expand?.seasons || !seasonSlug || !episodeSlug) {
-            return { currentSeason: null, currentEpisode: null, otherEpisodes: [] };
+            return defaultState;
         }
 
         const seasonNum = parseInt(String(seasonSlug), 10);
         const episodeNum = parseInt(String(episodeSlug), 10);
 
         const season = series.expand.seasons.find(s => s.season_no === seasonNum);
-        if (!season) return { currentSeason: null, currentEpisode: null, otherEpisodes: [] };
+        if (!season || !season.expand.episodes) return defaultState;
 
-        const episode = season.expand.episodes.find(e => e.episode_no === episodeNum);
-        const others = season.expand.episodes.filter(e => e.episode_no !== episodeNum);
+        // Sort episodes just in case they are not in order
+        const sortedEpisodes = [...season.expand.episodes].sort((a, b) => a.episode_no - b.episode_no);
 
-        return { currentSeason: season, currentEpisode: episode || null, otherEpisodes: others };
+        const currentEpisodeIndex = sortedEpisodes.findIndex(e => e.episode_no === episodeNum);
+        if (currentEpisodeIndex === -1) return defaultState;
+
+        const episode = sortedEpisodes[currentEpisodeIndex];
+        const next = sortedEpisodes[currentEpisodeIndex + 1] || null; // Get next, or null if it's the last one
+        const others = sortedEpisodes.filter(e => e.episode_no !== episodeNum);
+
+        return { currentSeason: season, currentEpisode: episode, otherEpisodes: others, nextEpisode: next };
     }, [series, seasonSlug, episodeSlug]);
 
 
-    // Configure VideoJS with the dynamic episode video ID
+    // Configure VideoJS
     const videoJsOptions = useMemo(() => ({
         autoplay: false,
         controls: true,
@@ -131,14 +140,27 @@ const EpisodePage = memo(() => {
         player.on("dispose", () => videojs.log("player will dispose"));
     };
 
-    // UI States
-    if (isLoading) return <div>Loading...</div>;
+    // --- UI States ---
+    if (isLoading) {
+        return (
+            <div
+                className="d-flex justify-content-center align-items-center"
+                style={{ height: "100vh" }}
+            >
+                <Spinner animation="border" variant="primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </Spinner>
+            </div>
+        );
+    }
+
     if (isError || !series) return <div>Error loading series data.</div>;
     if (!currentEpisode) return <div>Episode not found.</div>;
 
     return (
         <Fragment>
             <div className="iq-main-slider site-video">
+                {/* ... Video Player ... */}
                 <Container fluid>
                     <Row>
                         <Col lg="12">
@@ -150,6 +172,7 @@ const EpisodePage = memo(() => {
                 </Container>
             </div>
             <div className="details-part">
+                {/* ... Details and Tabs ... */}
                 <Container fluid>
                     <div className="trending-info mt-4 pt-0 pb-4">
                         <Row>
@@ -173,9 +196,8 @@ const EpisodePage = memo(() => {
                                 <ul className="p-0 mt-2 list-inline d-flex flex-wrap movie-tag">
                                     <li className="font-size-18">S{currentSeason?.season_no} E{currentEpisode.episode_no}</li>
                                     <li className="font-size-18">{currentEpisode.title}</li>
-                                    <li className="font-size-18">{currentEpisode.duration} min</li>
+                                    <li className="font-size-18">{formatTime(currentEpisode.duration)}</li>
                                 </ul>
-                                {/* Social Share Buttons... */}
                             </Col>
                             <FsLightBox image={getPbImageUrl(currentEpisode, currentEpisode.thumbnail)} />
                         </Row>
@@ -186,56 +208,112 @@ const EpisodePage = memo(() => {
                                 <Nav.Item>
                                     <Nav.Link eventKey="first">Description</Nav.Link>
                                 </Nav.Item>
-                                <Nav.Item>
+                                {/* <Nav.Item>
                                     <Nav.Link eventKey="second">Rate & Review</Nav.Link>
                                 </Nav.Item>
                                 <Nav.Item>
                                     <Nav.Link eventKey="third">Sources</Nav.Link>
-                                </Nav.Item>
+                                </Nav.Item> */}
                             </Nav>
                             <Tab.Content>
                                 <Tab.Pane className=" fade show" eventKey="first">
                                     <p>{currentEpisode.detail}</p>
                                 </Tab.Pane>
-                                <Tab.Pane className=" fade" eventKey="second">
+                                {/* <Tab.Pane className=" fade" eventKey="second">
                                     <ReviewComponent />
                                 </Tab.Pane>
                                 <Tab.Pane className=" fade" eventKey="third">
                                     <Sources />
-                                </Tab.Pane>
+                                </Tab.Pane> */}
                             </Tab.Content>
                         </Tab.Container>
                     </div>
                 </Container>
             </div>
+
+            {/* ** THIS IS THE NEW "NEXT EPISODE" SECTION ** */}
+            {nextEpisode && (
+                <div className="next-episode-block">
+                    <Container fluid>
+                        <div className="d-flex align-items-center justify-content-between px-3 pt-2 my-4">
+                            <h5 className="main-title text-capitalize mb-0">
+                                Next Episode
+                            </h5>
+                        </div>
+                        <div className="episode-block-wrapper" style={{ maxWidth: '400px', padding: '0 15px' }}>
+                            <div className="episode-block">
+                                <div className="block-image position-relative">
+                                    <Link replace href={`/tv-shows/${seriesSlug}/season/${currentSeason?.season_no}/episode/${nextEpisode.episode_no}`}>
+                                        <img
+                                            src={getPbImageUrl(nextEpisode, nextEpisode.thumbnail)}
+                                            alt="showImg"
+                                            className="img-fluid img-zoom"
+                                            loading="lazy"
+                                        />
+                                    </Link>
+                                    <div className="episode-number">
+                                        E{nextEpisode.episode_no}
+                                    </div>
+                                    <div className="episode-play">
+                                        <Link replace href={`/tv-shows/${seriesSlug}/season/${currentSeason?.season_no}/episode/${nextEpisode.episode_no}`}>
+                                            <i className="fa-solid fa-play"></i>
+                                        </Link>
+                                    </div>
+                                </div>
+                                <div className="epi-desc p-3">
+                                    <div className="d-flex align-items-center justify-content-between mb-3">
+                                        <span className="border-gredient-left text-white rel-date">
+                                            {new Date(nextEpisode.created).toLocaleDateString()}
+                                        </span>
+                                        <span className="text-primary run-time">
+                                            {formatTime(nextEpisode.duration)}
+                                        </span>
+                                    </div>
+                                    <Link replace href={`/tv-shows/${seriesSlug}/season/${currentSeason?.season_no}/episode/${nextEpisode.episode_no}`}>
+                                        <h5 className="epi-name text-white mb-0">
+                                            {nextEpisode.title}
+                                        </h5>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    </Container>
+                </div>
+            )}
+
             <div className="recommended-block">
                 <Container fluid>
                     <div className="overflow-hidden">
                         <div className="d-flex align-items-center justify-content-between px-3 pt-2 my-4">
                             <h5 className="main-title text-capitalize mb-0">
-                                More Like This
+                                More Episodes
                             </h5>
                         </div>
                         <div className="card-style-slider">
+                            {/* ... Swiper for other episodes ... */}
                             <Swiper
                                 key={String(themeSchemeDirection)}
                                 dir={String(themeSchemeDirection)}
                                 className="position-relative swiper-card"
-                                slidesPerView={4}
                                 modules={[Navigation]}
-                                loop={false} // Set to false if you have fewer slides than slidesPerView * 2
+                                loop={false}
                                 spaceBetween={5}
                                 navigation={{
                                     prevEl: ".swiper-button-prev",
                                     nextEl: ".swiper-button-next",
                                 }}
-                                breakpoints={{ /* Breakpoints... */ }}
+                                breakpoints={{
+                                    0: { slidesPerView: 1, spaceBetween: 10, },
+                                    576: { slidesPerView: 2, spaceBetween: 10, },
+                                    768: { slidesPerView: 3, spaceBetween: 15, },
+                                    1025: { slidesPerView: 4, spaceBetween: 20, },
+                                }}
                             >
                                 {otherEpisodes.map((item, index) => (
                                     <SwiperSlide key={index}>
                                         <div className="episode-block">
                                             <div className="block-image position-relative">
-                                                <Link href={`/tv-shows/${seriesSlug}/season/${currentSeason?.season_no}/episode/${item.episode_no}`}>
+                                                <Link replace href={`/tv-shows/${seriesSlug}/season/${currentSeason?.season_no}/episode/${item.episode_no}`}>
                                                     <img
                                                         src={getPbImageUrl(item, item.thumbnail)}
                                                         alt="showImg"
@@ -247,7 +325,7 @@ const EpisodePage = memo(() => {
                                                     E{item.episode_no}
                                                 </div>
                                                 <div className="episode-play">
-                                                    <Link href={`/tv-shows/${seriesSlug}/season/${currentSeason?.season_no}/episode/${item.episode_no}`}>
+                                                    <Link replace href={`/tv-shows/${seriesSlug}/season/${currentSeason?.season_no}/episode/${item.episode_no}`}>
                                                         <i className="fa-solid fa-play"></i>
                                                     </Link>
                                                 </div>
@@ -258,10 +336,10 @@ const EpisodePage = memo(() => {
                                                         {new Date(item.created).toLocaleDateString()}
                                                     </span>
                                                     <span className="text-primary run-time">
-                                                        {item.duration} min
+                                                        {formatTime(item.duration)}
                                                     </span>
                                                 </div>
-                                                <Link href={`/tv-shows/${seriesSlug}/season/${currentSeason?.season_no}/episode/${item.episode_no}`}>
+                                                <Link replace href={`/tv-shows/${seriesSlug}/season/${currentSeason?.season_no}/episode/${item.episode_no}`}>
                                                     <h5 className="epi-name text-white mb-0">
                                                         {item.title}
                                                     </h5>

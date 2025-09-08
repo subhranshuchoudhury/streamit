@@ -24,6 +24,7 @@ import { ClientProvider } from "@/providers/client.provider";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import { Season, TVShow } from "@/types/pb.types";
+import { formatTime } from "@/helper/ms-to-hm";
 
 // Helper to get correct PocketBase file URL
 const getPbImageUrl = (
@@ -120,7 +121,7 @@ const ShowsDetailPage = () => {
                                     {show.genres?.split(',').map((item, index) => (
                                         <li className="trending-list" key={index}>
                                             <Link
-                                                href="/view-all"
+                                                href={`/tv-shows/${show.slug}`}
                                                 className="text-primary text-uppercase font-size-18"
                                             >
                                                 {item.trim()}
@@ -136,14 +137,14 @@ const ShowsDetailPage = () => {
                             </div>
                             <div className="position-relative my-4">
                                 <Link
-                                    href="/tv-shows/episode"
+                                    href={`/tv-shows/${show.slug}/season/${selectedSeason?.season_no}/episode/1`}
                                     className="d-flex align-items-center gap-3"
                                 >
                                     <div className="play-button">
                                         <i className="fa-solid fa-play"></i>
                                     </div>
                                     <h4 className="text-white fw-bold m-0">
-                                        Watch latest Episode
+                                        Watch Now S{selectedSeason?.season_no} E1
                                     </h4>
                                 </Link>
                             </div>
@@ -154,7 +155,7 @@ const ShowsDetailPage = () => {
                                 </li>
                                 {show.tags?.split(',').map((item, index) => (
                                     <li key={index}>
-                                        <Link href="/view-all" className="title text-capitalize">
+                                        <Link href={`/tv-shows/${show.slug}`} className="title text-capitalize">
                                             {item.trim()}
                                         </Link>
                                         {/* Don't add comma for the last item */}
@@ -195,11 +196,15 @@ const ShowsDetailPage = () => {
                             <Tab.Content>
                                 <Tab.Pane className=" fade show" eventKey="first">
                                     <Row className="list-inline p-0 mb-0">
-                                        {episodesToDisplay.map((item, index) => (
+                                        {episodesToDisplay.sort(
+                                            (a, b) => a.episode_no - b.episode_no
+                                        ).map((item, index) => (
                                             <Col lg={3} sm={12} md={6} key={index}>
                                                 <div className="episode-block">
                                                     <div className="block-image position-relative">
-                                                        <Link href="/tv-shows/episode">
+                                                        <Link href={
+                                                            `/tv-shows/${show.slug}/season/${selectedSeason?.season_no}/episode/${item.episode_no}`
+                                                        }>
                                                             <img
                                                                 src={getPbImageUrl(item, item.thumbnail)}
                                                                 alt="showImg"
@@ -211,7 +216,9 @@ const ShowsDetailPage = () => {
                                                             S{selectedSeason?.season_no}E{item.episode_no}
                                                         </div>
                                                         <div className="episode-play">
-                                                            <Link href="/tv-shows/episode">
+                                                            <Link href={
+                                                                `/tv-shows/${show.slug}/season/${selectedSeason?.season_no}/episode/${item.episode_no}`
+                                                            }>
                                                                 <i className="fa-solid fa-play"></i>
                                                             </Link>
                                                         </div>
@@ -222,10 +229,12 @@ const ShowsDetailPage = () => {
                                                                 {new Date(item.created).toLocaleDateString()}
                                                             </span>
                                                             <span className="text-primary run-time">
-                                                                {item.duration} min
+                                                                {formatTime(item.duration)}
                                                             </span>
                                                         </div>
-                                                        <Link href="/tv-shows/episode">
+                                                        <Link href={
+                                                            `/tv-shows/${show.slug}/season/${selectedSeason?.season_no}/episode/${item.episode_no}`
+                                                        }>
                                                             <h5 className="epi-name text-white mb-0">
                                                                 {item.title}
                                                             </h5>

@@ -1,9 +1,9 @@
-import React, { Fragment, memo, useEffect, useMemo } from "react";
+import React, { Fragment, memo, useEffect, useMemo, useState } from "react";
 // Import Spinner from react-bootstrap
 import { Row, Col, Container, Nav, Tab, Spinner } from "react-bootstrap";
 import Link from 'next/link';
 import { useRouter } from "next/router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 // Components
 import ReviewComponent from "@/components/ReviewComponent";
@@ -26,7 +26,7 @@ import videojs from "video.js";
 import { ClientProvider } from "@/providers/client.provider";
 import { formatTime } from "@/helper/ms-to-hm";
 import { fetchStreamSource } from "@/helper/fetch-stream-details";
-import { Episode, Season, TVShow } from "@/types/pb.types";
+import { TVShow } from "@/types/pb.types";
 
 // Helper to get correct PocketBase file URL
 const getPbImageUrl = (
@@ -111,6 +111,8 @@ const EpisodePage = memo(() => {
         player.on("dispose", () => videojs.log("player will dispose"));
     };
 
+    const [TrailerOn, setTrailerOn] = useState(false);
+
     const useStreamSourceMutation = () => {
         return useMutation({
             mutationFn: fetchStreamSource,
@@ -118,7 +120,7 @@ const EpisodePage = memo(() => {
     };
 
 
-    const { mutate, data: streamSource, error: streamSourceError, isPending } = useStreamSourceMutation();
+    const { mutate, data: streamSource, error: streamSourceError, isPending: streamLoading } = useStreamSourceMutation();
 
 
     useEffect(() => {
@@ -147,9 +149,42 @@ const EpisodePage = memo(() => {
             </div>
         );
     }
+    const renderStreamError = () => {
+        if (!streamSourceError) return null;
 
-    if (isError || !series) return <div>Error loading series data.</div>;
-    if (!currentEpisode) return <div>Episode not found.</div>;
+        // @ts-ignore
+        const status = streamSourceError?.status;
+
+        if (status === 401) {
+            return (
+                <div className="text-center text-danger p-3 pt-3">
+                    <p>Your session has expired. Please log in again.</p>
+                    <button className="btn btn-primary" onClick={() => router.push("/auth/login")}>
+                        Login
+                    </button>
+                </div>
+            );
+        } else if (status === 403) {
+            return (
+                <div className="text-center p-3">
+                    <p>{streamSourceError.message || "You do not have permission to access this content."}</p>
+                    <button className="btn btn-primary" onClick={() => router.push("/extra/pricing-plan")}>
+                        Buy Plan
+                    </button>
+                </div>
+            );
+        } else {
+            return (
+                <div className="text-center text-danger p-3">
+                    <p>{streamSourceError.message || "Something went wrong. Please refresh the page."}</p>
+                    <button className="btn btn-primary" onClick={() => router.reload()}>
+                        Retry
+                    </button>
+                </div>
+            );
+        }
+    };
+
 
     return (
         <Fragment>
@@ -162,19 +197,27 @@ const EpisodePage = memo(() => {
                                 <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
                             </div> */}
 
-                            <div
-                                style={{ paddingTop: '56.25%', position: 'relative' }}
-                            >
-                                {
-                                    currentEpisode?.video_id && currentEpisode.library_id && streamSource?.source && streamSource.token && streamSource.token ? <>
-                                        <iframe src={streamSource.source} loading="lazy" style={{ border: 0, position: "absolute", top: 0, height: "100%", width: "100%" }} allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" allowFullScreen></iframe>
-                                    </> : <div>
-                                        <Spinner animation="border" variant="primary" role="status" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                                            <span className="visually-hidden">Loading...</span>
-                                        </Spinner>
+                            {streamLoading && <div style={{ padding: '20.25%' }}>
+                                <div className="d-flex justify-content-center text-primary">
+                                    <div className="spinner-border" role="status">
+                                        <span className="sr-only">Loading...</span>
                                     </div>
-                                }
+                                </div>
                             </div>
+                            }
+
+                            {
+                                currentEpisode?.video_id && currentEpisode?.library_id && streamSource?.source ? <>
+                                    <div
+                                        style={{ paddingTop: '56.25%', position: 'relative' }}
+                                    >
+                                        <iframe src={streamSource.source} loading="lazy" style={{ border: 0, position: "absolute", top: 0, height: "100%", width: "100%" }} allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" allowFullScreen></iframe>
+                                    </div>
+                                </> :
+                                    <div style={{ padding: '10.25%' }}>
+                                        {renderStreamError()}
+                                    </div>
+                            }
                         </Col>
                     </Row>
                 </Container>
@@ -187,27 +230,34 @@ const EpisodePage = memo(() => {
                             <Col md={9} className="col-12 mb-auto">
                                 <div className="d-md-flex">
                                     <h2 className="trending-text fw-bold texture-text text-uppercase mt-0">
-                                        {series.title}
+                                        {series?.title}
                                     </h2>
                                     <div className="slider-ratting d-flex align-items-center gap-2 ms-md-3 ms-0">
-                                        <RatingStar count={Math.floor(series.rating)} count1={series.rating % 1 > 0 ? 1 : 0} starColor="text-primary" />
-                                        <span className="text-white">
-                                            {series.rating.toFixed(1)}
-                                            <img
-                                                src={generateImgPath("/assets/images/movies/imdb-logo.svg")}
-                                                alt="imdb-logo"
-                                                className="img-fluid ms-2"
-                                            />
-                                        </span>
+                                        {
+                                            series?.rating && <>
+                                                <RatingStar count={Math.floor(series.rating)} count1={series.rating % 1 > 0 ? 1 : 0} starColor="text-primary" />
+                                                <span className="text-white">
+                                                    {series?.rating.toFixed(1)}
+                                                    <img
+                                                        src={generateImgPath("/assets/images/movies/imdb-logo.svg")}
+                                                        alt="imdb-logo"
+                                                        className="img-fluid ms-2"
+                                                    />
+                                                </span>
+                                            </>
+                                        }
                                     </div>
                                 </div>
                                 <ul className="p-0 mt-2 list-inline d-flex flex-wrap movie-tag">
-                                    <li className="font-size-18">S{currentSeason?.season_no} E{currentEpisode.episode_no}</li>
-                                    <li className="font-size-18">{currentEpisode.title}</li>
-                                    <li className="font-size-18">{formatTime(currentEpisode.duration)}</li>
+                                    <li className="font-size-18">S{currentSeason?.season_no} E{currentEpisode?.episode_no}</li>
+                                    <li className="font-size-18">{currentEpisode?.title}</li>
+                                    <li className="font-size-18">{formatTime(currentEpisode?.duration || 0)}</li>
                                 </ul>
                             </Col>
-                            <FsLightBox image={getPbImageUrl(currentEpisode, currentEpisode.thumbnail)} />
+                            {
+                                series?.trailer && series.trailer.length > 0 &&
+                                <FsLightBox sources={[series.trailer]} image={getPbImageUrl(series, series?.thumbnail)} />
+                            }
                         </Row>
                     </div>
                     <div className="content-details trending-info">
@@ -225,7 +275,7 @@ const EpisodePage = memo(() => {
                             </Nav>
                             <Tab.Content>
                                 <Tab.Pane className=" fade show" eventKey="first">
-                                    <p>{currentEpisode.detail}</p>
+                                    <p>{currentEpisode?.detail}</p>
                                 </Tab.Pane>
                                 {/* <Tab.Pane className=" fade" eventKey="second">
                                     <ReviewComponent />

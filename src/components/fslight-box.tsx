@@ -18,6 +18,7 @@ const FsLightBox = memo((props: Props) => {
   return (
     <Fragment>
       <Col
+        onClick={() => setToggler(!toggler)}
         md="3"
         className="trailor-video  col-12 mt-lg-0 mt-4 mb-md-0 mb-1 text-lg-right"
       >
@@ -32,8 +33,8 @@ const FsLightBox = memo((props: Props) => {
             loading="lazy"
           />
           <span className="content btn btn-transparant iq-button">
-            <i className="fa fa-play me-2 text-white" onClick={() => setToggler(!toggler)}></i>
-            <span onClick={() => setToggler(!toggler)}>Trailer Link</span>
+            <i className="fa fa-play me-2 text-white"></i>
+            <span>Watch Trailer</span>
           </span>
         </Link>
       </Col>

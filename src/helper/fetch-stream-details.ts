@@ -28,6 +28,6 @@ export const fetchStreamSource = async ({
     } catch (error) {
 
         console.error("Error fetching stream source:", error);
-        throw new Error("Failed to fetch stream source");
+        throw error;
     }
 };

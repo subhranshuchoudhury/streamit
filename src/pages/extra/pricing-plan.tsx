@@ -13,6 +13,9 @@ interface Plan {
   actual_price?: number; // Optional actual price for showing discounts
   features: { text: string; available: boolean }[];
   rzp_plan_id: string;
+  is_subscription: boolean;
+  detail: string;
+  button_title: string;
 }
 
 interface User {
@@ -33,7 +36,7 @@ const PricingPage = () => {
   const loadPlans = async () => {
     try {
       // Fetch plans sorted by price in ascending order
-      const fetchedPlans = await pb.collection("plans").getFullList<Plan>({ sort: "price" });
+      const fetchedPlans = await pb.collection("plans").getFullList<Plan>({ sort: "position" });
       console.log("Available Plans:", fetchedPlans);
       setPlans(fetchedPlans);
     } catch (error) {
@@ -90,7 +93,12 @@ const PricingPage = () => {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to create subscription");
+      // if (!res.ok) throw new Error("Failed to create subscription");
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to create payment subscription");
+      }
 
       const subscription = await res.json();
       const scriptLoaded = await loadRazorpayScript();
@@ -161,17 +169,133 @@ const PricingPage = () => {
       // @ts-ignore
       const rzp = new window.Razorpay(options);
       rzp.open();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Subscription error:", error);
       Swal.fire({
         icon: 'error',
         title: 'Subscription Error',
-        text: 'Failed to initiate subscription. Please try again later.',
+        text: error.message || 'Failed to initiate subscription. Please try again later.',
         confirmButtonText: 'OK'
       });
       setIsSubscribed(false);
     } finally {
       setLoadingStates(prev => ({ ...prev, [plan_id]: false }));
+    }
+  };
+
+
+  const handleOrderPayment = async (rzp_plan_id: string) => {
+    if (!pb.authStore.isValid || !pb.authStore.record) {
+      router.push("/auth/login");
+      return;
+    }
+
+    // Find the selected plan from state to get its price and other details
+    const selectedPlan = plans.find(p => p.rzp_plan_id === rzp_plan_id);
+    if (!selectedPlan) {
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Selected plan could not be found.' });
+      return;
+    }
+
+    setLoadingStates(prev => ({ ...prev, [rzp_plan_id]: true }));
+
+    try {
+      // 1. Create an ORDER, not a subscription. Pass the amount to your backend.
+      const res = await fetch("/api/create-order", { // Use the order creation endpoint
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan_id: selectedPlan.id,
+          customer_id: pb.authStore.record?.id,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to create payment order");
+      }
+
+      const order = await res.json(); // This is now an 'order' object
+
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Payment Gateway Error',
+          text: 'Could not load payment script. Please check your internet connection.',
+        });
+        setLoadingStates(prev => ({ ...prev, [rzp_plan_id]: false }));
+        return;
+      }
+
+      // 2. Configure Razorpay options using the 'order_id' from the response
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: order.amount, // Amount should come from the server-side order response
+        currency: order.currency,
+        name: "Chatpata Movies",
+        description: `Payment for ${selectedPlan.name}`,
+        order_id: order.id, // CRITICAL: Use 'order_id' for one-time payments
+        handler: async (response: any) => {
+          // 3. The handler now receives a signature to verify the payment
+          const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
+          try {
+            // 4. Send all three IDs to your verification endpoint
+            const verifyRes = await fetch('/api/verify-order', { // Use the order verification endpoint
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_payment_id,
+                razorpay_order_id,
+                razorpay_signature,
+                userId: pb.authStore.record?.id
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Payment Successful!',
+                text: `Your purchase of the ${selectedPlan.name} plan is complete.`,
+              });
+              loadUser(); // Refresh user data to reflect the purchase
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Verification Failed',
+                text: verifyData.error || 'Payment verification failed. Please contact support.',
+              });
+            }
+          } catch (error) {
+            console.error('Verification API error:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'An error occurred during verification. Please contact support.',
+            });
+          }
+        },
+        prefill: {
+          name: pb.authStore.record?.name,
+          email: pb.authStore.record?.email,
+        },
+        theme: { color: "#F37254" },
+      };
+
+      // @ts-ignore
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+
+    } catch (error: any) {
+      console.error("Payment error:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Payment Error',
+        text: error.message || 'Failed to initiate payment. Please try again.',
+      });
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [rzp_plan_id]: false }));
     }
   };
 
@@ -458,8 +582,18 @@ const PricingPage = () => {
                         }.</p>
                       </div>
                       <div className="subscribe-footer p-0">
-                        <button className="subscribe-btn" disabled>
-                          Manage Subscription
+                        <button className="subscribe-btn">
+                          {
+                            User.plan_expiry && new Date(User.plan_expiry) > new Date() ? (
+                              <>
+                                <i className="fas fa-check-circle me-2"></i> Active
+                              </>
+                            ) : (
+                              <>
+                                <i className="fas fa-times-circle me-2"></i> Expired
+                              </>
+                            )
+                          }
                         </button>
                       </div>
                     </div>
@@ -482,6 +616,7 @@ const PricingPage = () => {
                   )}
                   <div className="plan-header">
                     <h4 className="plan-name">{plan.name}</h4>
+                    <span className="sale-price text-decoration-line-through">₹{plan.price}</span>
                     <div className="price-container">
                       {plan.actual_price && plan.actual_price > plan.price && (
                         <span className="sale-price">₹{plan.actual_price}</span>
@@ -489,8 +624,9 @@ const PricingPage = () => {
                       <div>
                         <span className="currency">₹</span>
                         <span className="main-price">{plan.price}</span>
+
                       </div>
-                      <div className="period">per month</div>
+                      <div className="period">{plan.detail}</div>
                     </div>
                   </div>
                   <div className="features-list">
@@ -506,10 +642,16 @@ const PricingPage = () => {
                   <div className="subscribe-footer">
                     <button
                       className={`subscribe-btn ${getButtonClass(plan.name)}`}
-                      onClick={() => handleSubscribe(plan.rzp_plan_id)}
+                      onClick={() => {
+                        if (plan.is_subscription) {
+                          handleSubscribe(plan.rzp_plan_id)
+                        } else {
+                          handleOrderPayment(plan.rzp_plan_id)
+                        }
+                      }}
                       disabled={loadingStates[plan.rzp_plan_id]}
                     >
-                      {loadingStates[plan.rzp_plan_id] ? 'Processing...' : `Subscribe for ₹${plan.price}/month`}
+                      {loadingStates[plan.rzp_plan_id] ? 'Processing...' : plan.button_title}
                     </button>
                   </div>
                 </div>

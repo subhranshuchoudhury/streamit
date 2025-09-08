@@ -16,45 +16,65 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     }
 
     try {
-        // Get raw body
+        // Get raw body and signature from header
         const rawBody = (await buffer(req)).toString('utf8');
         const sig = req.headers['x-razorpay-signature'] as string;
 
-        // console.log('Razorpay Webhook Signature:', sig);
-        // console.log('Razorpay Webhook received:', rawBody);
-
-        // Verify webhook signature
+        // Verify the webhook signature
         const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET!);
         hmac.update(rawBody);
         const digest = hmac.digest('hex');
 
-        if (sig === digest) {
-            const event = JSON.parse(rawBody); // Parse the raw body now
-            if (event.event === 'subscription.charged' || event.event === 'subscription.activated') {
-
-                pb.authStore.save(process.env.DB_SUPER_USER_TOKEN!);
-
-                const subscription = event.payload.subscription.entity;
-
-                await pb.collection("users").update(subscription.notes.customer_id, {
-                    // TODO: we will make the plan expiry dynamic later based on the plan type
-                    plan_expiry: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
-                });
-
-                await pb.collection('users').update(
-                    subscription.notes.customer_id, {
-                    subscription_id: subscription.id,
-                    subscription_status: 'active',
-                    plan_name: subscription.notes.plan_name,
-                });
-
-                pb.authStore.clear();
-                console.log('Subscription Event:', JSON.stringify(subscription));
-            }
-            return res.status(200).json({ status: 'ok' });
-        } else {
+        // Compare signatures
+        if (sig !== digest) {
+            console.error('Webhook signature mismatch');
             return res.status(400).json({ status: 'signature mismatch' });
         }
+
+        // Signature is verified, parse the event
+        const event = JSON.parse(rawBody);
+
+        // Authenticate with PocketBase as admin
+        pb.authStore.save(process.env.DB_SUPER_USER_TOKEN!);
+
+        // --- Handle Subscription Events ---
+        if (event.event === 'subscription.charged' || event.event === 'subscription.activated') {
+            const subscription = event.payload.subscription.entity;
+            const customerId = subscription.notes.customer_id;
+
+            console.log(`Processing subscription event for user: ${customerId}`);
+
+            // Refactored to a single update call for efficiency
+            await pb.collection("users").update(customerId, {
+                plan_expiry: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
+                subscription_id: subscription.id,
+                subscription_status: 'active',
+                plan_name: subscription.notes.plan_name,
+            });
+
+            console.log(`Successfully updated subscription for user: ${customerId}`);
+        }
+        // --- Handle One-Time Payment Event (NEW) ---
+        else if (event.event === 'payment.captured') {
+            const payment = event.payload.payment.entity;
+            const customerId = payment.notes?.customer_id;
+
+            // Ensure we have the necessary info in notes
+            console.log(`Processing payment.captured event for user: ${customerId}`);
+
+            await pb.collection("users").update(customerId, {
+                plan_expiry: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
+                plan_name: payment.notes.plan_name,
+            });
+
+
+        }
+
+        // Clean up admin authentication
+        pb.authStore.clear();
+
+        return res.status(200).json({ status: 'ok' });
+
     } catch (error) {
         console.error('Webhook error:', error);
         return res.status(500).json({ error: 'Internal server error' });

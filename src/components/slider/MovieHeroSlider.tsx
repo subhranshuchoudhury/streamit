@@ -23,7 +23,6 @@ import { theme_scheme_direction } from "../../store/setting/selectors";
 // img (These would likely come from your API in a real scenario)
 import img1 from "../../../public//assets/images/movies/movie-banner-1.webp";
 import img2 from "../../../public//assets/images/movies/movie-banner-2.webp";
-import img3 from "../../../public//assets/images/movies/movie-banner-3.webp";
 // import pb from "@/lib/pocketbase";
 
 // 1. --- DYNAMIC DATA SOURCE (JSON Array) ---

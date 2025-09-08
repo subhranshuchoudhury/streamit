@@ -30,7 +30,7 @@ export default async function handler(
         const customer = await pb.collection("users").getOne(customer_id);
 
         if (customer?.plan_expiry && new Date(customer.plan_expiry) > new Date()) {
-            return res.status(400).json({ error: 'User already has an active subscription' });
+            return res.status(400).json({ error: 'You already have an active subscription' });
         }
 
         pb.authStore.clear();

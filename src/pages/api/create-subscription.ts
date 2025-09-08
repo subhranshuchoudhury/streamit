@@ -16,7 +16,7 @@ export default async function handler(
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { customer_id, plan_id } = req.body;
+    const { customer_id, plan_id, plan_name } = req.body;
 
 
     if (!customer_id || !plan_id) {
@@ -43,6 +43,7 @@ export default async function handler(
             total_count: 12, // 12 months
             notes: {
                 customer_id: String(customer_id).trim(),
+                plan_name: String(plan_name).trim(),
             },
         });
 

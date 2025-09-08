@@ -1107,7 +1107,7 @@ const HeaderDefault = memo((
                               {profile?.name}
                             </span>
                           </li>
-                          <li>
+                          {/* <li>
                             <Link
                               href="/play-list"
                               className="iq-sub-card d-flex align-items-center gap-3"
@@ -1169,7 +1169,7 @@ const HeaderDefault = memo((
                                 Watchlist
                               </h6>
                             </Link>
-                          </li>
+                          </li> */}
                           <li>
                             <Link
                               href="/extra/pricing-plan"

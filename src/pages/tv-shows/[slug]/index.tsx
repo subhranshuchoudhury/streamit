@@ -189,9 +189,9 @@ const ShowsDetailPage = () => {
                                 <Nav.Item>
                                     <Nav.Link eventKey="second">Description</Nav.Link>
                                 </Nav.Item>
-                                <Nav.Item>
+                                {/* <Nav.Item>
                                     <Nav.Link eventKey="third">Rate & Review</Nav.Link>
-                                </Nav.Item>
+                                </Nav.Item> */}
                             </Nav>
                             <Tab.Content>
                                 <Tab.Pane className=" fade show" eventKey="first">
@@ -248,9 +248,9 @@ const ShowsDetailPage = () => {
                                 <Tab.Pane className=" fade" eventKey="second">
                                     <p>{show.detail}</p>
                                 </Tab.Pane>
-                                <Tab.Pane className=" fade" eventKey="third">
+                                {/* <Tab.Pane className=" fade" eventKey="third">
                                     <ReviewComponent />
-                                </Tab.Pane>
+                                </Tab.Pane> */}
                             </Tab.Content>
                         </Tab.Container>
                     </div>

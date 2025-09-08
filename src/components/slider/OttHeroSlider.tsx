@@ -18,9 +18,11 @@ SwiperCore.use([Navigation, Thumbs]);
 // Redux Selector / Action
 import { useSelector } from "react-redux";
 import { theme_scheme_direction } from "../../store/setting/selectors";
-import { heroCarousel } from "@/StaticData/data";
 
 const OttHeroSlider = () => {
+
+  const heroCarousel: any = [];
+
   const themeSchemeDirection = useSelector(theme_scheme_direction);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperCore | null>(null);
   const [render, setRender] = useState(true)
@@ -75,7 +77,7 @@ const OttHeroSlider = () => {
                     className="swiper-horizontal swiper-container mb-0"
                   >
                     {
-                      heroCarousel && heroCarousel.map((item, index) => {
+                      heroCarousel && heroCarousel.map((item: any, index: any) => {
                         return <SwiperSlide key={index} className="swiper-bg">
                           <div className="block-images position-relative">
                             <div className="img-box">
@@ -120,7 +122,7 @@ const OttHeroSlider = () => {
                 className="swiper-container"
               >
                 {
-                  heroCarousel && heroCarousel.map((item, index) => {
+                  heroCarousel && heroCarousel.map((item: any, index: any) => {
                     return <SwiperSlide key={item.id} className="p-0">
                       <div className="slider--image block-images">
                         <Image src={item.image} loading="lazy" alt="banner" width={0}

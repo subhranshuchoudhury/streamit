@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { Col, Container, Row } from "react-bootstrap";
 import { useBreadcrumb } from "@/utilities/usePage";
 import pb from "@/lib/pocketbase";
+import Swal from "sweetalert2";
 
 // Define an interface for the plan object for better type safety
 interface Plan {
@@ -14,29 +15,51 @@ interface Plan {
   rzp_plan_id: string;
 }
 
+interface User {
+  id: string;
+  plan_expiry?: string; // Optional plan expiry date
+  [key: string]: any; // Other user fields
+}
+
 const PricingPage = () => {
   useBreadcrumb("Pricing Plan");
   const router = useRouter();
 
   const [plans, setPlans] = useState<Plan[]>([]);
+  const [User, setUser] = useState<User | null>(null)
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [loadingStates, setLoadingStates] = useState<{ [key: string]: boolean }>({});
 
-  useEffect(() => {
-    const loadPlans = async () => {
-      try {
-        // Fetch plans sorted by price in ascending order
-        const fetchedPlans = await pb.collection("plans").getFullList<Plan>({ sort: "price" });
-        console.log("Available Plans:", fetchedPlans);
-        setPlans(fetchedPlans);
-      } catch (error) {
-        console.error("Failed to load plans:", error);
-        // Optionally, set an error state to show a message to the user
-      }
-    };
+  const loadPlans = async () => {
+    try {
+      // Fetch plans sorted by price in ascending order
+      const fetchedPlans = await pb.collection("plans").getFullList<Plan>({ sort: "price" });
+      console.log("Available Plans:", fetchedPlans);
+      setPlans(fetchedPlans);
+    } catch (error) {
+      console.error("Failed to load plans:", error);
+      // Optionally, set an error state to show a message to the user
+    }
+  };
 
+  const loadUser = async () => {
+
+    try {
+      if (pb.authStore.isValid && pb.authStore.record) {
+        const user = await pb.collection("users").getOne(pb.authStore.record?.id);
+        setUser(user as User);
+      }
+    } catch (error) {
+      console.error("Failed to load user:", error);
+    }
+  }
+
+  useEffect(() => {
+    loadUser();
     loadPlans();
   }, []);
+
+
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -63,6 +86,7 @@ const PricingPage = () => {
         body: JSON.stringify({
           plan_id,
           customer_id: pb.authStore.record?.id,
+          plan_name: plans.find(p => p.rzp_plan_id === plan_id)?.name || 'Unknown Plan'
         }),
       });
 
@@ -71,14 +95,20 @@ const PricingPage = () => {
       const subscription = await res.json();
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
-        alert("Razorpay SDK failed to load");
+        Swal.fire({
+          icon: 'error',
+          title: 'Payment Gateway Error',
+          text: 'Please check your internet connection and try again.',
+          confirmButtonText: 'OK'
+        });
+        setLoadingStates(prev => ({ ...prev, [plan_id]: false }));
         return;
       }
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         subscription_id: subscription.id,
-        name: "Streamit",
+        name: "Chatpata Movies",
         handler: async (response: any) => {
           const { razorpay_payment_id, razorpay_subscription_id } = response;
           try {
@@ -94,13 +124,30 @@ const PricingPage = () => {
             const verifyData = await verifyRes.json();
             if (verifyData.success) {
               setIsSubscribed(true);
-              alert('Subscription successful!');
+              Swal.fire({
+                icon: 'success',
+                title: 'Subscription Successful',
+                text: 'Your subscription is now active!',
+                confirmButtonText: 'Great!'
+              });
+              loadUser(); // Refresh user data to get updated plan info
+              // alert('Subscription successful!');
             } else {
-              alert('Verification failed—please check later.');
+              Swal.fire({
+                icon: 'error',
+                title: 'Verification Failed',
+                text: verifyData.message || 'Subscription verification failed. Please contact support.',
+                confirmButtonText: 'OK'
+              });
             }
           } catch (error) {
             console.error('Verification error:', error);
-            alert('Payment succeeded, but verification delayed. Content will unlock soon.');
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'An error occurred during verification. Please contact support.',
+              confirmButtonText: 'OK'
+            });
             setIsSubscribed(true);
           }
         },
@@ -116,7 +163,13 @@ const PricingPage = () => {
       rzp.open();
     } catch (error) {
       console.error("Subscription error:", error);
-      alert("An error occurred during subscription. Please try again.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Subscription Error',
+        text: 'Failed to initiate subscription. Please try again later.',
+        confirmButtonText: 'OK'
+      });
+      setIsSubscribed(false);
     } finally {
       setLoadingStates(prev => ({ ...prev, [plan_id]: false }));
     }
@@ -386,26 +439,36 @@ const PricingPage = () => {
       <div className="section-padding">
         <Container>
           {/* DEMO ACTIVE PLAN CARD */}
-          <Row className="justify-content-center mb-5">
-            <Col lg="8" md="10">
-              <div className="pricing-card active-plan-card">
-                <div className="active-plan-badge">
-                  Your Current Plan
-                </div>
-                <div className="plan-header d-flex justify-content-between align-items-center px-4">
-                  <div>
-                    <h4 className="plan-name">Premium</h4>
-                    <p className="period mb-0">Your subscription is active until October 5, 2025.</p>
+
+          {
+            User && User.plan_expiry && <>
+              <Row className="justify-content-center mb-5">
+                <Col lg="8" md="10">
+                  <div className="pricing-card active-plan-card">
+                    <div className="active-plan-badge">
+                      Your Current Plan
+                    </div>
+                    <div className="plan-header d-flex justify-content-between align-items-center px-4">
+                      <div>
+                        <h4 className="plan-name">
+                          {User && User.plan_name ? User.plan_name : 'Active'}
+                        </h4>
+                        <p className="period mb-0">Your subscription is active until {
+                          new Date(User.plan_expiry).toLocaleDateString()
+                        }.</p>
+                      </div>
+                      <div className="subscribe-footer p-0">
+                        <button className="subscribe-btn" disabled>
+                          Manage Subscription
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="subscribe-footer p-0">
-                    <button className="subscribe-btn" disabled>
-                      Manage Subscription
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </Col>
-          </Row>
+                </Col>
+              </Row>
+            </>
+          }
+
 
           {/* DYNAMIC PRICING PLANS */}
           <Row className="justify-content-center">

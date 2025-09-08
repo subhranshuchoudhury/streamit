@@ -45,6 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     subscription.notes.customer_id, {
                     subscription_id: subscription.id,
                     subscription_status: 'active',
+                    plan_name: subscription.notes.plan_name,
                 });
 
                 pb.authStore.clear();

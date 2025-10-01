@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Col, Container, Row } from "react-bootstrap";
+import { Col, Container, Row, Spinner } from "react-bootstrap"; // Import Spinner
 import { useBreadcrumb } from "@/utilities/usePage";
 import pb from "@/lib/pocketbase";
 import Swal from "sweetalert2";
@@ -21,6 +21,7 @@ interface Plan {
 interface User {
   id: string;
   plan_expiry?: string; // Optional plan expiry date
+  plan_name?: string; // Added plan_name for the active card display
   [key: string]: any; // Other user fields
 }
 
@@ -32,6 +33,9 @@ const PricingPage = () => {
   const [User, setUser] = useState<User | null>(null)
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [loadingStates, setLoadingStates] = useState<{ [key: string]: boolean }>({});
+  
+  // New state to manage the initial page load
+  const [pageLoading, setPageLoading] = useState(true);
 
   const loadPlans = async () => {
     try {
@@ -46,7 +50,6 @@ const PricingPage = () => {
   };
 
   const loadUser = async () => {
-
     try {
       if (pb.authStore.isValid && pb.authStore.record) {
         const user = await pb.collection("users").getOne(pb.authStore.record?.id);
@@ -58,11 +61,21 @@ const PricingPage = () => {
   }
 
   useEffect(() => {
-    loadUser();
-    loadPlans();
+    const fetchInitialData = async () => {
+      setPageLoading(true); // Start loading
+      try {
+        // Fetch user and plans data in parallel for efficiency
+        await Promise.all([loadUser(), loadPlans()]);
+      } catch (error) {
+        console.error("Error fetching initial page data:", error);
+        // Handle error, maybe show a persistent error message
+      } finally {
+        setPageLoading(false); // Stop loading regardless of success or failure
+      }
+    };
+
+    fetchInitialData();
   }, []);
-
-
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -92,8 +105,6 @@ const PricingPage = () => {
           plan_name: plans.find(p => p.rzp_plan_id === plan_id)?.name || 'Unknown Plan'
         }),
       });
-
-      // if (!res.ok) throw new Error("Failed to create subscription");
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -139,7 +150,6 @@ const PricingPage = () => {
                 confirmButtonText: 'Great!'
               });
               loadUser(); // Refresh user data to get updated plan info
-              // alert('Subscription successful!');
             } else {
               Swal.fire({
                 icon: 'error',
@@ -190,7 +200,6 @@ const PricingPage = () => {
       return;
     }
 
-    // Find the selected plan from state to get its price and other details
     const selectedPlan = plans.find(p => p.rzp_plan_id === rzp_plan_id);
     if (!selectedPlan) {
       Swal.fire({ icon: 'error', title: 'Error', text: 'Selected plan could not be found.' });
@@ -200,8 +209,7 @@ const PricingPage = () => {
     setLoadingStates(prev => ({ ...prev, [rzp_plan_id]: true }));
 
     try {
-      // 1. Create an ORDER, not a subscription. Pass the amount to your backend.
-      const res = await fetch("/api/create-order", { // Use the order creation endpoint
+      const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -215,7 +223,7 @@ const PricingPage = () => {
         throw new Error(errorData.error || "Failed to create payment order");
       }
 
-      const order = await res.json(); // This is now an 'order' object
+      const order = await res.json();
 
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
@@ -228,20 +236,17 @@ const PricingPage = () => {
         return;
       }
 
-      // 2. Configure Razorpay options using the 'order_id' from the response
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: order.amount, // Amount should come from the server-side order response
+        amount: order.amount,
         currency: order.currency,
         name: "Chatpata Movies",
         description: `Payment for ${selectedPlan.name}`,
-        order_id: order.id, // CRITICAL: Use 'order_id' for one-time payments
+        order_id: order.id,
         handler: async (response: any) => {
-          // 3. The handler now receives a signature to verify the payment
           const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
           try {
-            // 4. Send all three IDs to your verification endpoint
-            const verifyRes = await fetch('/api/verify-order', { // Use the order verification endpoint
+            const verifyRes = await fetch('/api/verify-order', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -259,7 +264,7 @@ const PricingPage = () => {
                 title: 'Payment Successful!',
                 text: `Your purchase of the ${selectedPlan.name} plan is complete.`,
               });
-              loadUser(); // Refresh user data to reflect the purchase
+              loadUser();
             } else {
               Swal.fire({
                 icon: 'error',
@@ -299,7 +304,6 @@ const PricingPage = () => {
     }
   };
 
-  // Helper function to get button class based on plan name
   const getButtonClass = (planName: string) => {
     const name = planName.toLowerCase();
     if (name.includes('premium')) {
@@ -308,13 +312,14 @@ const PricingPage = () => {
     if (name.includes('basic')) {
       return 'basic-btn';
     }
-    return 'free-btn'; // Default or for other plans
+    return 'free-btn';
   };
 
   return (
     <Fragment>
 
       <style jsx>{`
+        /* --- ALL YOUR EXISTING STYLES --- */
         .pricing-card {
           border: 2px solid #333;
           border-radius: 12px;
@@ -562,102 +567,105 @@ const PricingPage = () => {
 
       <div className="section-padding">
         <Container>
-          {/* DEMO ACTIVE PLAN CARD */}
-
-          {
-            User && User.plan_expiry && <>
-              <Row className="justify-content-center mb-5">
-                <Col lg="8" md="10">
-                  <div className="pricing-card active-plan-card">
-                    <div className="active-plan-badge">
-                      Your Current Plan
-                    </div>
-                    <div className="plan-header d-flex justify-content-between align-items-center px-4">
-                      <div>
-                        <h4 className="plan-name">
-                          {User && User.plan_name ? User.plan_name : 'Active'}
-                        </h4>
-                        <p className="period mb-0">Your subscription is active until {
-                          new Date(User.plan_expiry).toLocaleDateString()
-                        }.</p>
-                      </div>
-                      <div className="subscribe-footer p-0">
-                        <button className="subscribe-btn">
-                          {
-                            User.plan_expiry && new Date(User.plan_expiry) > new Date() ? (
-                              <>
-                                <i className="fas fa-check-circle me-2"></i> Active
-                              </>
-                            ) : (
-                              <>
-                                <i className="fas fa-times-circle me-2"></i> Expired
-                              </>
-                            )
-                          }
-                        </button>
-                      </div>
-                    </div>
+          {/* USER'S CURRENT PLAN CARD */}
+          {User && User.plan_expiry && (
+            <Row className="justify-content-center mb-5">
+              <Col lg="8" md="10">
+                <div className="pricing-card active-plan-card">
+                  <div className="active-plan-badge">
+                    Your Current Plan
                   </div>
-                </Col>
-              </Row>
-            </>
-          }
-
-
-          {/* DYNAMIC PRICING PLANS */}
-          <Row className="justify-content-center">
-            {plans.map((plan) => (
-              <Col lg="4" md="6" className="mb-4" key={plan.id}>
-                <div className={`pricing-card ${plan.name === 'Premium' ? 'premium-card' : ''}`}>
-                  {plan.name === 'Premium' && (
-                    <div className="premium-badge">
-                      Most Popular
+                  <div className="plan-header d-flex justify-content-between align-items-center px-4">
+                    <div>
+                      <h4 className="plan-name">
+                        {User.plan_name ? User.plan_name : 'Active'}
+                      </h4>
+                      <p className="period mb-0">Your subscription is active until {
+                        new Date(User.plan_expiry).toLocaleDateString()
+                      }.</p>
                     </div>
-                  )}
-                  <div className="plan-header">
-                    <h4 className="plan-name">{plan.name}</h4>
-                    <span className="sale-price text-decoration-line-through">₹{plan.price}</span>
-                    <div className="price-container">
-                      {plan.actual_price && plan.actual_price > plan.price && (
-                        <span className="sale-price">₹{plan.actual_price}</span>
-                      )}
-                      <div>
-                        <span className="currency">₹</span>
-                        <span className="main-price">{plan.actual_price || plan.price}</span>
-
-                      </div>
-                      <div className="period">{plan.detail}</div>
-                    </div>
-                  </div>
-                  <div className="features-list">
-                    <ul>
-                      {plan.features.map((feature, index) => (
-                        <li key={index}>
-                          <i className={feature.available ? 'fas fa-check check-icon' : 'fas fa-times times-icon'}></i>
-                          <span className="feature-text">{feature.text}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="subscribe-footer">
-                    <button
-                      className={`subscribe-btn ${getButtonClass(plan.name)}`}
-                      onClick={() => {
-                        if (plan.is_subscription) {
-                          handleSubscribe(plan.rzp_plan_id)
-                        } else {
-                          handleOrderPayment(plan.rzp_plan_id)
+                    <div className="subscribe-footer p-0">
+                      <button className="subscribe-btn">
+                        {
+                          new Date(User.plan_expiry) > new Date() ? (
+                            <>
+                              <i className="fas fa-check-circle me-2"></i> Active
+                            </>
+                          ) : (
+                            <>
+                              <i className="fas fa-times-circle me-2"></i> Expired
+                            </>
+                          )
                         }
-                      }}
-                      disabled={loadingStates[plan.rzp_plan_id]}
-                    >
-                      {loadingStates[plan.rzp_plan_id] ? 'Processing...' : plan.button_title}
-                    </button>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </Col>
-            ))}
-          </Row>
+            </Row>
+          )}
+
+          {/* === CONDITIONAL RENDERING FOR LOADER === */}
+          {pageLoading ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '40vh' }}>
+              <Spinner animation="border" variant="danger" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+          ) : (
+            <Row className="justify-content-center">
+              {plans.map((plan) => (
+                <Col lg="4" md="6" className="mb-4" key={plan.id}>
+                  <div className={`pricing-card ${plan.name === 'Premium' ? 'premium-card' : ''}`}>
+                    {plan.name === 'Premium' && (
+                      <div className="premium-badge">
+                        Most Popular
+                      </div>
+                    )}
+                    <div className="plan-header">
+                      <h4 className="plan-name">{plan.name}</h4>
+                      {/* Original price logic seems a bit off, corrected it to show actual price crossed out and current price as main */}
+                      <div className="price-container">
+                        {plan.actual_price && plan.actual_price > plan.price ? (
+                          <span className="sale-price">₹{plan.actual_price}</span>
+                        ) : null}
+                        <div>
+                          <span className="currency">₹</span>
+                          <span className="main-price">{plan.price}</span>
+                        </div>
+                        <div className="period">{plan.detail}</div>
+                      </div>
+                    </div>
+                    <div className="features-list">
+                      <ul>
+                        {plan.features.map((feature, index) => (
+                          <li key={index}>
+                            <i className={feature.available ? 'fas fa-check check-icon' : 'fas fa-times times-icon'}></i>
+                            <span className="feature-text">{feature.text}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="subscribe-footer">
+                      <button
+                        className={`subscribe-btn ${getButtonClass(plan.name)}`}
+                        onClick={() => {
+                          if (plan.is_subscription) {
+                            handleSubscribe(plan.rzp_plan_id)
+                          } else {
+                            handleOrderPayment(plan.rzp_plan_id)
+                          }
+                        }}
+                        disabled={loadingStates[plan.rzp_plan_id]}
+                      >
+                        {loadingStates[plan.rzp_plan_id] ? 'Processing...' : plan.button_title}
+                      </button>
+                    </div>
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          )}
         </Container>
       </div>
     </Fragment>

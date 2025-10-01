@@ -623,7 +623,7 @@ const PricingPage = () => {
                       )}
                       <div>
                         <span className="currency">₹</span>
-                        <span className="main-price">{plan.price}</span>
+                        <span className="main-price">{plan.actual_price || plan.price}</span>
 
                       </div>
                       <div className="period">{plan.detail}</div>

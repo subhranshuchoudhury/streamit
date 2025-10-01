@@ -8,7 +8,7 @@ interface Props {
   watchlistLink: string,
   image: string,
   title: string,
-  movieTime: string
+  movieTime: string,
 }
 
 const CardStyle = memo((props: Props) => {
@@ -127,7 +127,7 @@ const CardStyle = memo((props: Props) => {
             </ul>
             <div className="iq-button">
               <Link
-                href="/movies/detail"
+                href={props.link}
                 className="btn text-uppercase position-relative rounded-circle"
               >
                 <i className="fa-solid fa-play ms-0"></i>

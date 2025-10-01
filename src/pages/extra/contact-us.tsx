@@ -21,7 +21,7 @@ const ContactPage = memo(() => {
           <Row>
             <Col lg="8">
               <div className="title-box">
-                <h2>Create With Us</h2>
+                <h2>Contact Us</h2>
                 <p className="mb-0">
                   To learn more about how ChatpataMovies can help you, contact us.
                 </p>
@@ -89,7 +89,7 @@ const ContactPage = memo(() => {
               </div>
               <div className="border-bottom pb-4 mb-4">
                 <h5>Get In Touch</h5>
-                <Link href="" className="text-primary">support@chatpatamovies.com</Link>
+                <Link href="" className="text-primary">chatpatamoviehandle.in@gmail.com</Link>
                 <p className="mb-0">available soon</p>
               </div>
               <div>

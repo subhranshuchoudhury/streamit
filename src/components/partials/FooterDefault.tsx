@@ -52,12 +52,12 @@ const FooterMega = memo(() => {
                   </div>
                   {/* <p className="mb-4 font-size-14">
                     Email us:{" "}
-                    <span className="text-white">customer@chatpatamovies.com</span>
+                    <span className="text-white">chatpatamoviehandle.in@gmail.com </span>
                   </p> */}
                   <p className="text-uppercase letter-spacing-1 font-size-14 mb-1">
                     customer services
                   </p>
-                  <p className="mb-0 contact text-white">customer@chatpatamovies.com</p>
+                  <p className="mb-0 text-white">chatpatamoviehandle.in@gmail.com </p>
                 </Col>
                 <Col xl={2} lg={6} className="mb-5 mb-lg-0">
                   <h4 className="footer-link-title">Quick Links</h4>
@@ -73,6 +73,11 @@ const FooterMega = memo(() => {
                       </Link>
                     </li> */}
                     <li className="mb-3">
+                      <Link href="/contact-us" className="ms-3">
+                        contact us
+                      </Link>
+                    </li>
+                    <li className="mb-3">
                       <Link href="/extra/pricing-plan" className="ms-3">
                         Pricing
                       </Link>
@@ -84,7 +89,7 @@ const FooterMega = memo(() => {
                     </li> */}
                   </ul>
                 </Col>
-                <Col xl={2} lg={6} className="mb-5 mb-lg-0">
+                {/* <Col xl={2} lg={6} className="mb-5 mb-lg-0">
                   <h4 className="footer-link-title">Movies to watch</h4>
                   <ul className="list-unstyled footer-menu">
                     <li className="mb-3">
@@ -103,23 +108,23 @@ const FooterMega = memo(() => {
                       </Link>
                     </li>
                   </ul>
-                </Col>
+                </Col> */}
                 <Col xl={2} lg={6} className="mb-5 mb-lg-0">
-                  <h4 className="footer-link-title">About company</h4>
+                  <h4 className="footer-link-title">About Legal</h4>
                   <ul className="list-unstyled footer-menu">
-                    <li className="mb-3">
-                      <Link href="/contact-us" className="ms-3">
-                        contact us
-                      </Link>
-                    </li>
                     <li className="mb-3">
                       <Link href="/privacy-policy" className="ms-3">
                         privacy policy
                       </Link>
                     </li>
-                    <li>
-                      <Link href="/extra/terms-of-use" className="ms-3">
-                        Terms of use
+                    <li className="mb-3">
+                      <Link href="/terms-&-conditions" className="ms-3">
+                        Terms & Conditions
+                      </Link>
+                    </li>
+                    <li className="mb-3">
+                      <Link href="/refunds-cancellation" className="ms-3">
+                        Refunds & Cancellation
                       </Link>
                     </li>
                   </ul>
@@ -190,7 +195,7 @@ const FooterMega = memo(() => {
                 <Col md={6}>
                   <ul className="menu list-inline p-0 d-flex flex-wrap align-items-center">
                     <li className="menu-item">
-                      <Link href="/extra/terms-of-use"> Terms Of Use </Link>
+                      <Link href="/terms-&-conditions"> Terms & Conditions </Link>
                     </li>
                     <li id="menu-item-7316" className="menu-item">
                       <Link href="/privacy-policy"> Privacy Policy </Link>
@@ -198,9 +203,9 @@ const FooterMega = memo(() => {
                     {/* <li className="menu-item">
                       <Link href="/faq"> FAQ </Link>
                     </li> */}
-                    <li className="menu-item">
+                    {/* <li className="menu-item">
                       <Link href="/play-list"> Watch List </Link>
-                    </li>
+                    </li> */}
                   </ul>
                   <p className="font-size-14">
                     © <span className="currentYear">2025</span>{" "}

@@ -848,40 +848,40 @@ export const sectionSliders = [
 
 export const populerSlider = [
   {
-    image: generateImgPath("/assets/images/movies/popular/01.webp"),
-    title: "CRW",
+    image: generateImgPath("/assets/images/uploads/adhuri_522.jpg"),
+    title: "Adhuri",
     movieTime: "2hr: 12mins",
+    slug:"andheri-raat",
+    type:"tv-shows"
   },
   {
-    image: generateImgPath("/assets/images/movies/popular/02.webp"),
-    title: "Batte Wiire",
-    movieTime: "1hr: 22mins",
+    image: generateImgPath("/assets/images/uploads/adhuri_522.jpg"),
+    title: "Adhuri",
+    movieTime: "2hr: 12mins",
+    slug:"andheri-raat",
+    type:"tv-shows"
   },
   {
-    image: generateImgPath("/assets/images/movies/popular/03.webp"),
-    title: "Goal",
-    movieTime: "2hr: 30mins",
+    image: generateImgPath("/assets/images/uploads/adhuri_522.jpg"),
+    title: "Adhuri",
+    movieTime: "2hr: 12mins",
+    slug:"andheri-raat",
+    type:"tv-shows"
   },
   {
-    image: generateImgPath("/assets/images/movies/popular/04.webp"),
-    title: "Dandacg",
-    movieTime: "1hr: 30mins",
+    image: generateImgPath("/assets/images/uploads/adhuri_522.jpg"),
+    title: "Adhuri",
+    movieTime: "2hr: 12mins",
+    slug:"andheri-raat",
+    type:"tv-shows"
   },
   {
-    image: generateImgPath("/assets/images/movies/popular/05.webp"),
-    title: "Mexcan",
-    movieTime: "1hr: 30mins",
-  },
-  {
-    image: generateImgPath("/assets/images/movies/popular/06.webp"),
-    title: "Oit moleld",
-    movieTime: "1hr: 30mins",
-  },
-  {
-    image: generateImgPath("/assets/images/movies/popular/07.webp"),
-    title: "Another Danger",
-    movieTime: "1hr: 30mins",
-  },
+    image: generateImgPath("/assets/images/uploads/adhuri_522.jpg"),
+    title: "Adhuri",
+    movieTime: "2hr: 12mins",
+    slug:"andheri-raat",
+    type:"tv-shows"
+  }
 ];
 
 export const ottVerticleLatestMovies = [
@@ -942,40 +942,33 @@ export const verticleLatestMovies = [
 
 export const recommendedforYou = [
   {
-    image: generateImgPath("/assets/images/movies/recommended/01.webp"),
-    title: "Giikre",
-    movieTime: "2hr: 30mins",
+    image: generateImgPath("/assets/images/uploads/adhuri_522.jpg"),
+    title: "Adhuri",
+    movieTime: "2hr: 12mins",
+    slug:"andheri-raat",
+    type:"tv-shows"
   },
   {
-    image: generateImgPath("/assets/images/movies/recommended/02.webp"),
-    title: "Arrival",
-    movieTime: "3hr: 00mins",
+    image: generateImgPath("/assets/images/uploads/adhuri_522.jpg"),
+    title: "Adhuri",
+    movieTime: "2hr: 12mins",
+    slug:"andheri-raat",
+    type:"tv-shows"
   },
   {
-    image: generateImgPath("/assets/images/movies/recommended/03.webp"),
-    title: "Pricess",
-    movieTime: "1hr: 45mins",
+    image: generateImgPath("/assets/images/uploads/adhuri_522.jpg"),
+    title: "Adhuri",
+    movieTime: "2hr: 12mins",
+    slug:"andheri-raat",
+    type:"tv-shows"
   },
   {
-    image: generateImgPath("/assets/images/movies/recommended/04.webp"),
-    title: "Soull Meate",
-    movieTime: "2hr: 30mins",
-  },
-  {
-    image: generateImgPath("/assets/images/movies/recommended/05.webp"),
-    title: "Dangacg",
-    movieTime: "1hr: 45mins",
-  },
-  {
-    image: generateImgPath("/assets/images/movies/recommended/06.webp"),
-    title: "crcikeft",
-    movieTime: "2hr: 45mins",
-  },
-  {
-    image: generateImgPath("/assets/images/movies/recommended/07.webp"),
-    title: "Avengrs",
-    movieTime: "1hr: 45mins",
-  },
+    image: generateImgPath("/assets/images/uploads/adhuri_522.jpg"),
+    title: "Adhuri",
+    movieTime: "2hr: 12mins",
+    slug:"andheri-raat",
+    type:"tv-shows"
+  }
 ];
 
 export const tabSlider = [
@@ -1343,40 +1336,26 @@ export const suggested = [
 
 export const spacialLatestMovie = [
   {
-    image: generateImgPath("/assets/images/movies/latest/01.webp"),
-    title: "mortal nories",
-    movieTime: "2hr : 12mins",
+    image: generateImgPath("/assets/images/uploads/adhuri_522.jpg"),
+    title: "Adhuri",
+    movieTime: "2hr: 12mins",
+    slug:"andheri-raat",
+    type:"tv-shows"
   },
   {
-    image: generateImgPath("/assets/images/movies/latest/02.webp"),
-    title: "advetre",
-    movieTime: "1hr : 30mins",
+    image: generateImgPath("/assets/images/uploads/adhuri_522.jpg"),
+    title: "Adhuri",
+    movieTime: "2hr: 12mins",
+    slug:"andheri-raat",
+    type:"tv-shows"
   },
   {
-    image: generateImgPath("/assets/images/movies/latest/03.webp"),
-    title: "net ailo",
-    movieTime: "2hr : 30mins",
-  },
-  {
-    image: generateImgPath("/assets/images/movies/latest/04.webp"),
-    title: "ariivaal",
-    movieTime: "2hr : 45mins",
-  },
-  {
-    image: generateImgPath("/assets/images/movies/latest/05.webp"),
-    title: "dramma",
-    movieTime: "1hr : 55mins",
-  },
-  {
-    image: generateImgPath("/assets/images/movies/latest/06.webp"),
-    title: "aune",
-    movieTime: "1hr : 25mins",
-  },
-  {
-    image: generateImgPath("/assets/images/movies/latest/07.webp"),
-    title: "everest",
-    movieTime: "1hr : 45mins",
-  },
+    image: generateImgPath("/assets/images/uploads/adhuri_522.jpg"),
+    title: "Adhuri",
+    movieTime: "2hr: 12mins",
+    slug:"andheri-raat",
+    type:"tv-shows"
+  }
 ];
 export const upcommingMovie = [
   {

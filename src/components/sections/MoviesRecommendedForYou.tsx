@@ -15,7 +15,7 @@ const MoviesRecommendedForYou = memo(()=>  {
       <SectionSlider
         title={title}
         list={recommendedforYou}
-        className="recommended-block"
+        className="popular-movies-block streamit-block"
         slidesPerView={6}
       >
         {(data) => (
@@ -24,7 +24,7 @@ const MoviesRecommendedForYou = memo(()=>  {
             title={data.title}
             movieTime={data.movieTime}
             watchlistLink="/play-list"
-            link="/movies/detail"
+            link={`/${data.type}/${data.slug}`}
           />
         )}
       </SectionSlider>

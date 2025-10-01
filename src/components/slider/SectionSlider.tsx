@@ -72,12 +72,12 @@ const SectionSlider: FC<SectionSliderProps> = memo(
           <div className="overflow-hidden card-style-slider" ref={slider}>
             <div className="d-flex align-items-center justify-content-between px-3 my-4">
               <h5 className="main-title text-capitalize mb-0">{title}</h5>
-              <Link
+              {/* <Link
                 href={link ? link : "#"}
                 className="text-primary iq-view-all text-decoration-none"
               >
                 View All
-              </Link>
+              </Link> */}
             </div>
             <Swiper
               key={String(themeSchemeDirection)}

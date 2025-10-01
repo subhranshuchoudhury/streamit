@@ -25,7 +25,7 @@ const MerchandiseFooter = memo(() => {
                                     <h4 className='mb-0 contact text-white fw-bold'>
                                         <Link href="tel:+4805550103"> Available Soon</Link>
                                     </h4>
-                                    <span className='d-inline-block mt-4 mb-0 font-size-14'> Email Us: <Link href="maito:customer@chatpatamovies.com">customer@chatpatamovies.com</Link></span>
+                                    <span className='d-inline-block mt-4 mb-0 font-size-14'> Email Us: <Link href="maito:chatpatamoviehandle.in@gmail.com ">chatpatamoviehandle.in@gmail.com </Link></span>
                                     <div className="mt-5">
                                         <p className="text-uppercase letter-spacing-1 font-size-14 mb-1">Stay Connected on:</p>
                                         <ul className="p-0 mt-4 mb-0 list-unstyled widget_social_media">

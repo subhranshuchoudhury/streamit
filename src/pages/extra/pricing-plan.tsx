@@ -567,105 +567,102 @@ const PricingPage = () => {
 
       <div className="section-padding">
         <Container>
-          {/* USER'S CURRENT PLAN CARD */}
-          {User && User.plan_expiry && (
-            <Row className="justify-content-center mb-5">
-              <Col lg="8" md="10">
-                <div className="pricing-card active-plan-card">
-                  <div className="active-plan-badge">
-                    Your Current Plan
-                  </div>
-                  <div className="plan-header d-flex justify-content-between align-items-center px-4">
-                    <div>
-                      <h4 className="plan-name">
-                        {User.plan_name ? User.plan_name : 'Active'}
-                      </h4>
-                      <p className="period mb-0">Your subscription is active until {
-                        new Date(User.plan_expiry).toLocaleDateString()
-                      }.</p>
-                    </div>
-                    <div className="subscribe-footer p-0">
-                      <button className="subscribe-btn">
-                        {
-                          new Date(User.plan_expiry) > new Date() ? (
-                            <>
-                              <i className="fas fa-check-circle me-2"></i> Active
-                            </>
-                          ) : (
-                            <>
-                              <i className="fas fa-times-circle me-2"></i> Expired
-                            </>
-                          )
-                        }
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Col>
-            </Row>
-          )}
+          {/* DEMO ACTIVE PLAN CARD */}
 
-          {/* === CONDITIONAL RENDERING FOR LOADER === */}
-          {pageLoading ? (
-            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '40vh' }}>
-              <Spinner animation="border" variant="danger" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </Spinner>
-            </div>
-          ) : (
-            <Row className="justify-content-center">
-              {plans.map((plan) => (
-                <Col lg="4" md="6" className="mb-4" key={plan.id}>
-                  <div className={`pricing-card ${plan.name === 'Premium' ? 'premium-card' : ''}`}>
-                    {plan.name === 'Premium' && (
-                      <div className="premium-badge">
-                        Most Popular
-                      </div>
-                    )}
-                    <div className="plan-header">
-                      <h4 className="plan-name">{plan.name}</h4>
-                    {/* <span className="sale-price text-decoration-line-through">₹{plan.price}</span> */}
-                      <div className="price-container">
-                        {plan.price && plan.price > plan.actual_price ? (
-                          <span className="sale-price">₹{plan.price}</span>
-                        ) : null}
-                        <div>
-                          <span className="currency">₹</span>
-                          <span className="main-price">{plan.actual_price}</span>
-                        </div>
-                        <div className="period">{plan.detail}</div>
-                      </div>
+          {
+            User && User.plan_expiry && <>
+              <Row className="justify-content-center mb-5">
+                <Col lg="8" md="10">
+                  <div className="pricing-card active-plan-card">
+                    <div className="active-plan-badge">
+                      Your Current Plan
                     </div>
-                    <div className="features-list">
-                      <ul>
-                        {plan.features.map((feature, index) => (
-                          <li key={index}>
-                            <i className={feature.available ? 'fas fa-check check-icon' : 'fas fa-times times-icon'}></i>
-                            <span className="feature-text">{feature.text}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="subscribe-footer">
-                      <button
-                        className={`subscribe-btn ${getButtonClass(plan.name)}`}
-                        onClick={() => {
-                          if (plan.is_subscription) {
-                            handleSubscribe(plan.rzp_plan_id)
-                          } else {
-                            handleOrderPayment(plan.rzp_plan_id)
+                    <div className="plan-header d-flex justify-content-between align-items-center px-4">
+                      <div>
+                        <h4 className="plan-name">
+                          {User && User.plan_name ? User.plan_name : 'Active'}
+                        </h4>
+                        <p className="period mb-0">Your subscription is active until {
+                          new Date(User.plan_expiry).toLocaleDateString()
+                        }.</p>
+                      </div>
+                      <div className="subscribe-footer p-0">
+                        <button className="subscribe-btn">
+                          {
+                            User.plan_expiry && new Date(User.plan_expiry) > new Date() ? (
+                              <>
+                                <i className="fas fa-check-circle me-2"></i> Active
+                              </>
+                            ) : (
+                              <>
+                                <i className="fas fa-times-circle me-2"></i> Expired
+                              </>
+                            )
                           }
-                        }}
-                        disabled={loadingStates[plan.rzp_plan_id]}
-                      >
-                        {loadingStates[plan.rzp_plan_id] ? 'Processing...' : plan.button_title}
-                      </button>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </Col>
-              ))}
-            </Row>
-          )}
+              </Row>
+            </>
+          }
+
+
+          {/* DYNAMIC PRICING PLANS */}
+          <Row className="justify-content-center">
+            {plans.map((plan) => (
+              <Col lg="4" md="6" className="mb-4" key={plan.id}>
+                <div className={`pricing-card ${plan.name === 'Premium' ? 'premium-card' : ''}`}>
+                  {plan.name === 'Premium' && (
+                    <div className="premium-badge">
+                      Most Popular
+                    </div>
+                  )}
+                  <div className="plan-header">
+                    <h4 className="plan-name">{plan.name}</h4>
+                    <span className="sale-price text-decoration-line-through">₹{plan.price}</span>
+                    <div className="price-container">
+                      {plan.actual_price && plan.actual_price > plan.price && (
+                        <span className="sale-price">₹{plan.actual_price}</span>
+                      )}
+                      <div>
+                        <span className="currency">₹</span>
+                        <span className="main-price">{plan.actual_price || plan.price}</span>
+
+                      </div>
+                      <div className="period">{plan.detail}</div>
+                    </div>
+                  </div>
+                  <div className="features-list">
+                    <ul>
+                      {plan.features.map((feature, index) => (
+                        <li key={index}>
+                          <i className={feature.available ? 'fas fa-check check-icon' : 'fas fa-times times-icon'}></i>
+                          <span className="feature-text">{feature.text}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="subscribe-footer">
+                    <button
+                      className={`subscribe-btn ${getButtonClass(plan.name)}`}
+                      onClick={() => {
+                        if (plan.is_subscription) {
+                          handleSubscribe(plan.rzp_plan_id)
+                        } else {
+                          handleOrderPayment(plan.rzp_plan_id)
+                        }
+                      }}
+                      disabled={loadingStates[plan.rzp_plan_id]}
+                    >
+                      {loadingStates[plan.rzp_plan_id] ? 'Processing...' : plan.button_title}
+                    </button>
+                  </div>
+                </div>
+              </Col>
+            ))}
+          </Row>
         </Container>
       </div>
     </Fragment>

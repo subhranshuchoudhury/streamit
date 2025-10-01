@@ -25,7 +25,7 @@ const ContactUs = memo(() => {
             </Col>
             <Col lg="6" md="7">
               <h2 className="text-capitalize text-start">Contact Us Here</h2>
-              <p className="mb-0 text-start">Streamit is located in Los Angeles city and you can contact us at <Link href="mailto:info@medyapim.com">hello@streamit.com</Link> for any tech-related support and assistance. We love to hear from our Streamit users.</p>
+              <p className="mb-0 text-start">ChatpataMovies is located in Los Angeles city and you can contact us at <Link href="mailto:info@medyapim.com">hello@streamit.com</Link> for any tech-related support and assistance. We love to hear from our ChatpataMovies users.</p>
               <Row className="mt-2 iq-rtl-direction">
                 <Col md="4">
                   <div className="counter">

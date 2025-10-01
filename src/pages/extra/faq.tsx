@@ -30,7 +30,7 @@ const FAQPage = memo(() => {
                       <i aria-hidden="true" className="fa fa-plus inactive"></i>
                     </div>
                     <h4 className="mb-0 accordian-title iq-heading-title">
-                      What Is Streamit?
+                      What Is ChatpataMovies?
                     </h4>
                   </div>
                   <div

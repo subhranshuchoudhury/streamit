@@ -393,7 +393,7 @@ const MerchandiseHome = () => {
                 <Logo />
                 <h2 className="mt-3 mb-3">
                   {" "}
-                  Wear Streamit, Buy Streamit and Love Streamit{" "}
+                  Wear ChatpataMovies, Buy ChatpataMovies and Love ChatpataMovies{" "}
                 </h2>
                 <p className="mb-4 line-count-3">
                   Buy exclusive streamit products from our store and get amazing

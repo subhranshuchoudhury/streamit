@@ -414,8 +414,8 @@ const HeaderDefault = memo((
                           </Nav.Item>
                           <Nav.Item as="li">
                             <Link
-                              href="/extra/contact-us"
-                              className={`${location.asPath === "/extra/contact-us"
+                              href="/contact-us"
+                              className={`${location.asPath === "/contact-us"
                                 ? "active"
                                 : ""
                                 } nav-link`}
@@ -436,8 +436,8 @@ const HeaderDefault = memo((
                           </Nav.Item>
                           <Nav.Item as="li">
                             <Link
-                              href="/extra/privacy-policy"
-                              className={`${location.asPath === "/extra/privacy-policy"
+                              href="/privacy-policy"
+                              className={`${location.asPath === "/privacy-policy"
                                 ? "active"
                                 : ""
                                 } nav-link`}

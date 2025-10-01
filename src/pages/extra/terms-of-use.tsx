@@ -20,7 +20,7 @@ const TermsofUse = memo(() => {
             <p className='mb-0'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In quis nisl dignissim, placerat diam ac, egestas ante. Morbi varius quis orci feugiat hendrerit. Morbi ullamcorper consequat justo, in posuere nisi efficitur sed. Vestibulum semper dolor id arcu finibus volutpat. Integer condimentum ex tellus, ac finibus metus sodales in. Proin blandit congue ipsum ac dapibus. Integer blandit eros elit, vel luctus tellus finibus in. Aliquam non urna ut leo vestibulum mattis ac nec dolor. Nulla libero mauris, dapibus non aliquet viverra, elementum eget lorem</p>
           </div>
           <div className="title-box">
-            <h4 className="mb-4">The Streamit website works best with:</h4>
+            <h4 className="mb-4">The ChatpataMovies website works best with:</h4>
             <ul>
               <li>Latest version of Google Chrome</li>
               <li>Latest version of Firefox</li>

@@ -264,7 +264,7 @@ const HeaderMerchandise = memo(() => {
                           </Collapse>
                         </Nav.Item>
                         <Nav.Item as="li">
-                          <Nav.Link aria-expanded={open2} href="" onClick={() => setOpen2(!open2)} className={`${location.pathname === '/extra/about-us' || location.pathname === '/extra/contact-us' || location.pathname === '/fa1' || location.pathname === '/extra/privacy-policy' || location.pathname === '/pricing' || location.pathname === '/coming-soon' ? 'active' : ''}`}>
+                          <Nav.Link aria-expanded={open2} href="" onClick={() => setOpen2(!open2)} className={`${location.pathname === '/extra/about-us' || location.pathname === '/contact-us' || location.pathname === '/fa1' || location.pathname === '/privacy-policy' || location.pathname === '/pricing' || location.pathname === '/coming-soon' ? 'active' : ''}`}>
                             <span className="item-name">Pages</span>
                             <span className="menu-icon ms-2">
                               <i className="fa fa-caret-down toggledrop-desktop right-icon" aria-hidden="true"></i>
@@ -280,13 +280,13 @@ const HeaderMerchandise = memo(() => {
                                 <Link href="/extra/about-us" className="nav-link"> About Us </Link>
                               </Nav.Item>
                               <Nav.Item as="li">
-                                <Link href="/extra/contact-us" className="nav-link"> Contact Us </Link>
+                                <Link href="/contact-us" className="nav-link"> Contact Us </Link>
                               </Nav.Item>
                               <Nav.Item as="li">
                                 <Link href="/extra/faq" className="nav-link"> FAQ </Link>
                               </Nav.Item>
                               <Nav.Item as="li">
-                                <Link href="/extra/privacy-policy" className="nav-link"> Privacy Policy </Link>
+                                <Link href="/privacy-policy" className="nav-link"> Privacy Policy </Link>
                               </Nav.Item>
                               <Nav.Item as="li">
                                 <Link href="/extra/pricing-plan" className="nav-link"> Pricing Plan </Link>
@@ -602,7 +602,7 @@ const HeaderMerchandise = memo(() => {
                             <Link href="https://iqonic.desky.support/">Customer Support</Link>
                           </li>
                           <li>
-                            <Link href="/extra/contact-us">Help?</Link>
+                            <Link href="/contact-us">Help?</Link>
                           </li>
                         </ul>
                       </div>

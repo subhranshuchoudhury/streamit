@@ -23,7 +23,7 @@ const ContactPage = memo(() => {
               <div className="title-box">
                 <h2>Create With Us</h2>
                 <p className="mb-0">
-                  To learn more about how Streamit can help you, contact us.
+                  To learn more about how ChatpataMovies can help you, contact us.
                 </p>
               </div>
               <Form className="mb-5 mb-lg-0">
@@ -84,14 +84,13 @@ const ContactPage = memo(() => {
               <div className="border-bottom pb-4 mb-4">
                 <h5>Come See Us</h5>
                 <span>
-                  Townhouse Agency Consoling. LLC 50 ean 2 See, 41A Xo New York
-                  NY 20159
+                  Uttarpradesh, India
                 </span>
               </div>
               <div className="border-bottom pb-4 mb-4">
                 <h5>Get In Touch</h5>
-                <Link href="" className="text-primary">support@streamit.com</Link>
-                <p className="mb-0">(144) 1234 4567</p>
+                <Link href="" className="text-primary">support@chatpatamovies.com</Link>
+                <p className="mb-0">available soon</p>
               </div>
               <div>
                 <h5>Follow Us</h5>
@@ -146,7 +145,7 @@ const ContactPage = memo(() => {
           <Row className="row">
             <Col lg="10" >
               <div className="title-box">
-                <h3 className="fw-500">To Learn More About How Streamit Can Help You, Contact Us. We'd Be Happy To Take On The Challenge!</h3>
+                <h3 className="fw-500">To Learn More About How ChatpataMovies Can Help You, Contact Us. We'd Be Happy To Take On The Challenge!</h3>
               </div>
             </Col>
             <Col lg="2" className="d-none d-lg-block"></Col>
@@ -162,7 +161,7 @@ const ContactPage = memo(() => {
                 </div>
                 <div style={{zIndex: '1'}}>
                   <h6 className="font-size-18 fw-500 mb-4">For General Enquiries</h6>
-                  <p className="mb-1 font-size-14">Call On: <span className="text-primary">(144) 1234 4567</span>
+                  <p className="mb-1 font-size-14">Call On: <span className="text-primary">available soon</span>
                   </p>
                   <p className="mb-0">Mail: <Link href="mailto:info@medyapim.com" className="text-white fw-500">info@enquiries.com</Link>
                   </p>

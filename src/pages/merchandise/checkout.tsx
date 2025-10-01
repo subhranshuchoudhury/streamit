@@ -257,7 +257,7 @@ const CheckoutPage = () => {
                                         </div>
                                         <p className="mt-3 mb-5">
                                             Your personal data will be used to process your order, support your experience
-                                            throughout this website, and for other purposes described in our <Link href="/extra/privacy-policy">privacy policy</Link>
+                                            throughout this website, and for other purposes described in our <Link href="/privacy-policy">privacy policy</Link>
                                             .</p>
                                         <CustomButton buttonTitle="Place Order" link="/merchandise/track-order" linkButton="false" />
                                     </div>

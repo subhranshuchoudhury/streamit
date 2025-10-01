@@ -106,8 +106,8 @@ const Login = () => {
                       </div>
                     </div>
                   </Form> */}
-                  {/* <p className="my-4 text-center fw-500 text-white">New to Streamit? <Link href="/auth/sign-up" className="text-primary ms-1">Register</Link></p> */}
-                  <p className="my-4 text-center fw-500 text-white">New to Streamit?</p>
+                  {/* <p className="my-4 text-center fw-500 text-white">New to ChatpataMovies? <Link href="/auth/sign-up" className="text-primary ms-1">Register</Link></p> */}
+                  <p className="my-4 text-center fw-500 text-white">New to ChatpataMovies?</p>
                   <div className="seperator d-flex justify-content-center align-items-center">
                     <span className="line"></span>
                     {/* <span className="mx-2">OR</span> */}

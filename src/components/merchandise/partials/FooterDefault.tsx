@@ -23,9 +23,9 @@ const MerchandiseFooter = memo(() => {
                                         costumer services
                                     </p>
                                     <h4 className='mb-0 contact text-white fw-bold'>
-                                        <Link href="tel:+4805550103"> + (480) 555-0103</Link>
+                                        <Link href="tel:+4805550103"> Available Soon</Link>
                                     </h4>
-                                    <span className='d-inline-block mt-4 mb-0 font-size-14'> Email Us: <Link href="maito:customer@streamit.com">customer@streamit.com</Link></span>
+                                    <span className='d-inline-block mt-4 mb-0 font-size-14'> Email Us: <Link href="maito:customer@chatpatamovies.com">customer@chatpatamovies.com</Link></span>
                                     <div className="mt-5">
                                         <p className="text-uppercase letter-spacing-1 font-size-14 mb-1">Stay Connected on:</p>
                                         <ul className="p-0 mt-4 mb-0 list-unstyled widget_social_media">
@@ -79,10 +79,10 @@ const MerchandiseFooter = memo(() => {
                                         <Col lg="6">
                                             <ul className="list-unstyled footer-menu mb-0">
                                                 <li className="mb-2">
-                                                    <Link href="/extra/contact-us" className="ms-3">Contact Us</Link>
+                                                    <Link href="/contact-us" className="ms-3">Contact Us</Link>
                                                 </li>
                                                 <li>
-                                                    <Link href="/extra/privacy-policy" className="ms-3">Privacy Policy</Link>
+                                                    <Link href="/privacy-policy" className="ms-3">Privacy Policy</Link>
                                                 </li>
                                             </ul>
                                         </Col>
@@ -120,10 +120,7 @@ const MerchandiseFooter = memo(() => {
                     <Container fluid>
                         <Row className="align-items-center">
                             <Col md="6" className="text-md-start text-center">
-                                <p className="m-0 font-size-14 text-capitalize">© <span className="currentYear">{currentYear}</span><Link href="/"> STREAMIT </Link> All rights reserved.</p>
-                            </Col>
-                            <Col md="6" className="text-md-end text-center">
-                                <p className="m-0 font-size-14">Powered by <Link href="https://iqonic.design/" target="_blank">IQONIC DESIGN</Link></p>
+                                <p className="m-0 font-size-14 text-capitalize">© <span className="currentYear">{currentYear}</span><Link href="/">CHATPATAMOVIES </Link> All rights reserved.</p>
                             </Col>
                         </Row>
                     </Container>

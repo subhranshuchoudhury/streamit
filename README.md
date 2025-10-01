@@ -120,9 +120,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 ---
 
 - /about-us | /extra/about-us
-- /contact-us | /extra/contact-us
+- /contact-us | /contact-us
 - /faq | /extra/faq
-- /PrivacyPolicy /extra/privacy-policy
+- /PrivacyPolicy /privacy-policy
 - /pricing | /pricing-plan
 - /coming-soon | /extra/coming-soon
 - /error-page-one | /extra/error-page-one

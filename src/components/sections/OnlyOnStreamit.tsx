@@ -8,7 +8,7 @@ import CardStyle from "../cards/CardStyle";
 import { sectionSliders } from "../../StaticData/data";
 
 const OnlyOnStreamit = memo(() => {
-  const [title] = useState("Only On Streamit");
+  const [title] = useState("Only On ChatpataMovies");
   const [onlyonstreamit] = useState(sectionSliders);
   return (
     <Fragment>

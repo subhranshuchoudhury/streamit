@@ -42,7 +42,7 @@ const TeamSection = memo(() => {
               <div className="title-box text-center">
                 <h2>Masterminds Team</h2>
                 <p className="mb-0">
-                  Your Streamit is build by one of the best and well experienced
+                  Your ChatpataMovies is build by one of the best and well experienced
                   web developers and an awarded Envato Elite Author.
                 </p>
               </div>

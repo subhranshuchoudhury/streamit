@@ -7,7 +7,7 @@ import { Col, Row } from "react-bootstrap";
 import Link from "next/link";
 
 // Next-Image
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 
 //react fslight-box
 import FsLightbox from "fslightbox-react";
@@ -21,41 +21,40 @@ import { useSelector } from "react-redux";
 import { theme_scheme_direction } from "../../store/setting/selectors";
 
 // img (These would likely come from your API in a real scenario)
-import img1 from "../../../public//assets/images/movies/movie-banner-1.webp";
-import img2 from "../../../public//assets/images/movies/movie-banner-2.webp";
+import arimg from "../../../public/assets/images/uploads/andheri_raat_1080_1920.jpg"
 // import pb from "@/lib/pocketbase";
 
 // 1. --- DYNAMIC DATA SOURCE (JSON Array) ---
 // This array simulates the data you would fetch from your API.
-const moviesData = [
+
+type SliderDataType = {
+  id:number,
+  title:string,
+  image:StaticImageData,
+  rating:number,
+  mpaRating:string,
+  duration:string,
+  releaseDate:string,
+  description:string,
+  slug:string,
+  trailerUrl:string,
+  type: "movies" | "tv-shows"
+}
+
+const SliderData:SliderDataType[] = [
   {
     id: 1,
-    title: "The Elephant Dream",
+    title: "Andheri Raat",
     // image: `${pb.baseURL}/api/files/pbc_4044198014/l52yqqiqa92pfi5/maxresdefault_twnxeov35q.jpg`,
-    image: img1,
+    image: arimg,
     rating: 3.5,
     mpaRating: "PG",
     duration: "1hr : 44mins",
     releaseDate: "Feb 2018",
-    description:
-      "Dinosaurs are a diverse group of reptiles of the clade Dinosauria. They first appeared during the Triassic period, between 243 and 233.23 million years ago.",
-    slug: "the-elephant-dream", // For dynamic routing
+    description:"A single night can change everything. Amidst the shadows of a city that never sleeps, a story of secrets, betrayal, and unexpected twists unfolds under the veil of the Andheri Raat.",
+    slug: "andheri-raat", // For dynamic routing
     trailerUrl: "/assets/images/video/trailer.mp4", // Movie-specific trailer
-    type: "movies",
-  },
-  {
-    id: 2,
-    title: "The Peacky Blinders",
-    image: img2,
-    rating: 3.5,
-    mpaRating: "G",
-    duration: "2hr : 42mins",
-    releaseDate: "Nov 2017",
-    description:
-      "The most brutal emperor in the history of the world. He was the founder of the most contiguous empire of the world i.e. the Mongol empire. He made an army by himself.",
-    slug: "the-peacky-blinders",
-    trailerUrl: "/assets/images/video/trailer.mp4", // Replace with actual trailer
-    type: "tv-shows"
+    type: "tv-shows",
   }
 ];
 
@@ -91,8 +90,8 @@ const MovieHeroSlider = memo(() => {
                 className="swiper-banner-container mb-0"
               >
                 {/* 2. --- MAPPING OVER THE DATA --- */}
-                {/* We map over the moviesData array to dynamically create a SwiperSlide for each movie. */}
-                {moviesData.map((movie) => (
+                {/* We map over the SliderData:SliderDataType[] array to dynamically create a SwiperSlide for each movie. */}
+                {SliderData.map((movie) => (
                   <SwiperSlide key={movie.id}>
                     <div className="movie-banner-image">
                       <Image src={movie.image} alt="movie-banner-image" />

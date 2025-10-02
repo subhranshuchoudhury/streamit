@@ -76,9 +76,6 @@ const ShowsDetailPage = () => {
         }
     }, [show]);
 
-    // =================================================================
-    // ENHANCED LOADING STATE: Use a centered Bootstrap spinner
-    // =================================================================
     if (isLoading) {
         return (
             <div className="d-flex justify-content-center align-items-center vh-100">
@@ -89,9 +86,6 @@ const ShowsDetailPage = () => {
         );
     }
 
-    // =================================================================
-    // ENHANCED ERROR STATE: Use a Bootstrap Alert for clear feedback
-    // =================================================================
     if (isError) {
         return (
             <Container className="py-5">
@@ -105,9 +99,6 @@ const ShowsDetailPage = () => {
         );
     }
     
-    // =================================================================
-    // NOT FOUND STATE: Handle cases where the show doesn't exist
-    // =================================================================
     if (!show) {
         return (
              <Container className="py-5">
@@ -133,16 +124,32 @@ const ShowsDetailPage = () => {
     return (
         <Fragment>
             <div className="tv-show-detail">
-                {/* ... (rest of your component JSX remains unchanged) ... */}
                 <Container fluid>
+                    {/* ================================================================= */}
+                    {/* START: MODIFIED BANNER SECTION                                    */}
+                    {/* ================================================================= */}
                     <div
-                        className="overlay-wrapper iq-main-slider "
+                        className="overlay-wrapper iq-main-slider"
                         style={{
-                            background: `url(${getPbImageUrl(show, show.thumbnail)})`,
+                            position: 'relative', // Added for positioning child elements
+                            background: `
+                                linear-gradient(to top, rgba(0, 0, 0, 0.9) 10%, rgba(0, 0, 0, 0.2) 100%),
+                                url(${getPbImageUrl(show, show.thumbnail)})
+                            `,
                             backgroundSize: "cover",
+                            backgroundPosition: "center center",
                             backgroundRepeat: "no-repeat",
                         }}
                     >
+                        {/* New Animated Play Button */}
+                        <div className="video-play-button">
+                             <Link href={`/tv-shows/${show.slug}/season/${selectedSeason?.season_no || 1}/episode/1`}>
+                                <div className="pulse-button">
+                                    <i className="fa-solid fa-play"></i>
+                                </div>
+                            </Link>
+                        </div>
+
                         <div className="banner-caption">
                             <div className="trending-info p-0">
                                 <h1 className="texture-text big-font text-uppercase mt-2">
@@ -175,19 +182,8 @@ const ShowsDetailPage = () => {
                                 </div>
                                 <p className="line-count-2 my-3">{show.detail}</p>
                             </div>
-                            <div className="position-relative my-4">
-                                <Link
-                                    href={`/tv-shows/${show.slug}/season/${selectedSeason?.season_no}/episode/1`}
-                                    className="d-flex align-items-center gap-3"
-                                >
-                                    <div className="play-button">
-                                        <i className="fa-solid fa-play"></i>
-                                    </div>
-                                    <h4 className="text-white fw-bold m-0">
-                                        Watch Now S{selectedSeason?.season_no} E1
-                                    </h4>
-                                </Link>
-                            </div>
+                            
+                            {/* The old "Watch Now" button was here and has been removed */}
 
                             <ul className="iq-blogtag list-unstyled d-flex flex-wrap align-items-center gap-3 p-0">
                                 <li className="iq-tag-title text-primary mb-0">
@@ -204,6 +200,9 @@ const ShowsDetailPage = () => {
                             </ul>
                         </div>
                     </div>
+                    {/* ================================================================= */}
+                    {/* END: MODIFIED BANNER SECTION                                      */}
+                    {/* ================================================================= */}
                 </Container>
             </div>
             <div className="show-detail section-padding">

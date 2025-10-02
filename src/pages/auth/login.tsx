@@ -2,7 +2,7 @@
 import React, { Fragment } from 'react'
 
 //react bootstrap
-import { Col, Container, Form, Row } from 'react-bootstrap'
+import { Col, Container, Row } from 'react-bootstrap'
 
 //router
 import Link from 'next/link';
